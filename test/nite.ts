@@ -5,6 +5,8 @@
  * This code is open-sourced under the MIT license.
  */
 
-const Nite = require('nite');
+import { Nite } from 'nite';
 
-Nite.version;
+let nite = Nite('test-provider');
+
+nite.version;
