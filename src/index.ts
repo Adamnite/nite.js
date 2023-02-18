@@ -5,7 +5,7 @@
  * This code is open-sourced under the MIT license.
  */
 
-import * as packageInfo from '../package.json';
+const packageInfo = require('../package.json');
 
 class Nite {
   /**
