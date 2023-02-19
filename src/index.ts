@@ -5,21 +5,23 @@
  * This code is open-sourced under the MIT license.
  */
 
+import { Provider } from "./providers/provider";
+
 const packageInfo = require('../package.json');
 
 class Nite {
   /**
    * Version of the Adamnite JavaScript API.
    */
-  version: string = packageInfo.version;
+  readonly version: string = packageInfo.version;
 
   /**
    * Provider responsible for the communication with the blockchain.
-   * It takes JSON-RPC requests and returns the response.
+   * It takes RPC requests and returns the response.
    */
-  provider: string | null = null;
+  private provider: Provider | null = null;
 
-  constructor(provider: string) {
+  constructor(provider: Provider) {
     this.provider = provider;
   }
 
@@ -28,7 +30,7 @@ class Nite {
    *
    * @param provider A valid provider
    */
-  setProvider(provider: string) {
+  setProvider(provider: Provider) {
     this.provider = provider;
   }
 
@@ -37,7 +39,7 @@ class Nite {
    *
    * @returns The current provider or null
    */
-  currentProvider() : string | null {
+  currentProvider() : Provider | null {
     return this.provider;
   }
 
