@@ -5,7 +5,7 @@
  * This code is open-sourced under the MIT license.
  */
 
-import { Provider } from "./provider";
+import { Provider } from './provider';
 
 export class HttpProvider implements Provider {
   /**
@@ -17,6 +17,12 @@ export class HttpProvider implements Provider {
     this.url = url;
   }
 
+  /**
+   * Send RPC calls over HTTP.
+   *
+   * @param payload Payload to be sent
+   * @returns Promise
+   */
   send<T>(payload: string): Promise<T> {
     const options = {
       method: 'POST',
@@ -24,7 +30,7 @@ export class HttpProvider implements Provider {
       headers: {
         'Content-Type': 'application/json'
       }
-    }
+    };
 
     return fetch(this.url, options)
       .then(response => {
@@ -32,6 +38,6 @@ export class HttpProvider implements Provider {
           throw new Error(response.statusText);
         }
         return response.json() as Promise<T>
-      })
+      });
   }
 };
