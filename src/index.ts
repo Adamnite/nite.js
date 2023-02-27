@@ -5,7 +5,8 @@
  * This code is open-sourced under the MIT license.
  */
 
-import { Provider } from "./providers/provider";
+import { Account } from './accounts/account';
+import { Provider } from './providers/provider';
 
 import * as packageInfo from '../package.json';
 
@@ -64,9 +65,9 @@ class Nite {
   /**
    * Returns accounts managed by the node.
    *
-   * @returns Addresses managed by the node
+   * @returns Accounts managed by the node
    */
-  getAccounts() : string[] {
+  getAccounts() : Account[] {
     return [];
   }
 
@@ -77,7 +78,7 @@ class Nite {
    * @returns The current balance for the given address
    */
   getBalance(address: string) : string {
-    return "";
+    return '';
   }
 }
 
