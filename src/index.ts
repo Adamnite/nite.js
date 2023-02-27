@@ -5,9 +5,10 @@
  * This code is open-sourced under the MIT license.
  */
 
-import { Provider } from "./providers/provider";
+import { Account } from './accounts/account';
+import { Provider } from './providers/provider';
 
-const packageInfo = require('../package.json');
+import * as packageInfo from '../package.json';
 
 class Nite {
   /**
@@ -49,7 +50,7 @@ class Nite {
    * @returns The protocol version
    */
   getProtocolVersion() : string {
-    return "1.0.0";
+    return '1.0.0';
   }
 
   /**
@@ -64,9 +65,9 @@ class Nite {
   /**
    * Returns accounts managed by the node.
    *
-   * @returns Addresses
+   * @returns Accounts managed by the node
    */
-  getAccounts() : object[] {
+  getAccounts() : Account[] {
     return [];
   }
 
@@ -77,7 +78,7 @@ class Nite {
    * @returns The current balance for the given address
    */
   getBalance(address: string) : string {
-    return "";
+    return '';
   }
 }
 
