@@ -14,6 +14,7 @@ test('create', () => {
   match(
     account, {
       ok: v => {
+        expect((v as Account).recoveryPhrase.length).toBe(24);
         expect((v as Account).recoveryPhrase.every(
           phrase => words.includes(phrase)
         )).toBe(true);

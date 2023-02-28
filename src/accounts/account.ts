@@ -59,7 +59,7 @@ export function createAccount() : Result<Account, AccountError> {
   const entropy = randomBytes(ENTROPY_BYTES_COUNT);
 
   const entropyBits = toBinary(entropy);
-  const checksumBits = toBinary(sha256(entropy).slice(0, ENTROPY_BITS_COUNT / 32));
+  const checksumBits = toBinary(sha256(entropy)).slice(0, ENTROPY_BITS_COUNT / 32);
 
   const bits = entropyBits + checksumBits;
   const chunks = bits.match(/(.{1,11})/g);
