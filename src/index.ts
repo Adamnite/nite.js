@@ -5,12 +5,17 @@
  * This code is open-sourced under the MIT license.
  */
 
-import { Account } from './accounts/account';
+import { Account, createAccount } from './accounts/account';
 import { Provider } from './providers/provider';
+import { Result, match } from './utils/result';
 
 import * as packageInfo from '../package.json';
 
-class Nite {
+export enum NiteError {
+  InvalidInput
+};
+
+export class Nite {
   /**
    * Version of the Adamnite JavaScript API.
    */
@@ -67,8 +72,33 @@ class Nite {
    *
    * @returns Accounts managed by the node
    */
-  getAccounts() : Account[] {
-    return [];
+  async getAccounts() : Promise<Account[]> {
+    let accounts: Account[] = [];
+
+    /**
+     * Mock few accounts for testing integration purposes.
+     * @todo Remove once Adamnite RPC is implemented.
+     */
+    match(
+      createAccount(), {
+        ok: v => { accounts.push(v); },
+        err: e => {}
+      }
+    );
+    match(
+      createAccount(), {
+        ok: v => { accounts.push(v); },
+        err: e => {}
+      }
+    );
+    match(
+      createAccount(), {
+        ok: v => { accounts.push(v); },
+        err: e => {}
+      }
+    );
+
+    return accounts;
   }
 
   /**
@@ -77,9 +107,21 @@ class Nite {
    * @param address The address to get the balance of
    * @returns The current balance for the given address
    */
-  getBalance(address: string) : string {
-    return '';
+  async getBalance(address: string) : Promise<Result<string, NiteError>> {
+    if (!address) {
+      return {
+        ok: false,
+        error: NiteError.InvalidInput
+      };
+    }
+
+    /**
+     * Mock balance for testing integration purposes.
+     * @todo Remove once Adamnite RPC is implemented.
+     */
+    return {
+      ok: true,
+      value: '1000000000000'
+    };
   }
 }
-
-export default Nite;
