@@ -84,8 +84,8 @@ export function createAccount() : Result<Account, AccountError> {
   return {
     ok: true,
     value: {
-      address: Buffer.from(publicKey).toString('hex'),
-      privateKey: Buffer.from(privateKey).toString('hex'),
+      address: '0x' + Buffer.from(publicKey).toString('hex'),
+      privateKey: '0x' + Buffer.from(privateKey).toString('hex'),
       recoveryPhrase: recoveryPhrase
     }
   };
@@ -123,8 +123,8 @@ export function getAccountFromPrivateKey(privateKey: string) : Result<Account, A
   return {
     ok: true,
     value: {
-      address: Buffer.from(publicKey).toString('hex'),
-      privateKey: privateKey,
+      address: '0x' + Buffer.from(publicKey).toString('hex'),
+      privateKey: '0x' + privateKey,
       recoveryPhrase: recoveryPhrase
     }
   };

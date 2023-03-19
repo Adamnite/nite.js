@@ -15,8 +15,11 @@ test('createAccount', () => {
       ok: v => {
         const newAccount = v as Account;
 
-        expect(newAccount.address.length).toBe(130);
-        expect(newAccount.privateKey.length).toBe(64);
+        expect(newAccount.address.startsWith('0x')).toBe(true);
+        expect(newAccount.privateKey.startsWith('0x')).toBe(true);
+
+        expect(newAccount.address.length).toBe('0x'.length + 130);
+        expect(newAccount.privateKey.length).toBe('0x'.length + 64);
 
         expect(newAccount.recoveryPhrase.length).toBe(24);
         expect(newAccount.recoveryPhrase.every(
@@ -43,7 +46,7 @@ test('getAccountFromPrivateKey', () => {
   );
 
   match(
-    getAccountFromPrivateKey('d6c0c61f6db291d5638340cb09a4431e'), {
+    getAccountFromPrivateKey('0xd6c0c61f6db291d5638340cb09a4431e'), {
       ok: v => {
         expect(false);
       },
@@ -54,7 +57,7 @@ test('getAccountFromPrivateKey', () => {
   );
 
   match(
-    getAccountFromPrivateKey('zzzzzd6c0c61f6db291d5638340cb09a'), {
+    getAccountFromPrivateKey('0xzzzzzd6c0c61f6db291d5638340cb09a'), {
       ok: v => {
         expect(false);
       },
@@ -64,8 +67,8 @@ test('getAccountFromPrivateKey', () => {
     }
   );
 
-  const privateKey = 'd6c0c61f6db291d5638340cb09a4431e4a600dcb8f21e3edba103c73de9d279f';
-  const address = '04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f';
+  const privateKey = '0xd6c0c61f6db291d5638340cb09a4431e4a600dcb8f21e3edba103c73de9d279f';
+  const address = '0x04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f';
 
   match(
     getAccountFromPrivateKey(privateKey), {
