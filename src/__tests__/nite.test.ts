@@ -5,7 +5,7 @@
  * This code is open-sourced under the MIT license.
  */
 
-import Nite from '../index';
+import { Nite } from '../index';
 import { Provider } from '../providers/provider';
 
 export class MockProvider implements Provider {

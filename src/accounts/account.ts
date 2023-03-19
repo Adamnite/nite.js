@@ -30,15 +30,11 @@ export interface Account {
 };
 
 export enum AccountError {
-  Generic
+  InvalidPrivateKey,
+  RecoveryPhraseGenerationFailed,
 };
 
-/**
- * Creates a new account.
- *
- * @returns New account
- */
-export function createAccount() : Result<Account, AccountError> {
+const getRandomRecoveryPhrase = () => {
   const padLeft = (str: string, padding: string, length: number) => {
     while (str.length < length) {
       str = padding + str;
@@ -64,13 +60,22 @@ export function createAccount() : Result<Account, AccountError> {
   const bits = entropyBits + checksumBits;
   const chunks = bits.match(/(.{1,11})/g);
 
-  const recoveryPhrase = chunks?.map(binary => {
+  return chunks?.map(binary => {
     const idx = parseInt(binary, 2);
     return words[idx];
   });
+}
+
+/**
+ * Creates a new account.
+ *
+ * @returns New account
+ */
+export function createAccount() : Result<Account, AccountError> {
+  const recoveryPhrase = getRandomRecoveryPhrase();
 
   if (!recoveryPhrase) {
-    return { ok: false, error: AccountError.Generic };
+    return { ok: false, error: AccountError.RecoveryPhraseGenerationFailed };
   }
 
   const privateKey = secp256k1.utils.randomPrivateKey();
@@ -79,9 +84,48 @@ export function createAccount() : Result<Account, AccountError> {
   return {
     ok: true,
     value: {
-      address: Buffer.from(publicKey).toString('hex'),
-      privateKey: Buffer.from(privateKey).toString('hex'),
+      address: '0x' + Buffer.from(publicKey).toString('hex'),
+      privateKey: '0x' + Buffer.from(privateKey).toString('hex'),
       recoveryPhrase: recoveryPhrase
     }
   };
 };
+
+/**
+ * Creates an account from private key.
+ *
+ * @param privateKey The private key in hex format to get an account for
+ * @returns New account
+ */
+export function getAccountFromPrivateKey(privateKey: string) : Result<Account, AccountError> {
+  const recoveryPhrase = getRandomRecoveryPhrase();
+
+  if (!recoveryPhrase) {
+    return { ok: false, error: AccountError.RecoveryPhraseGenerationFailed };
+  }
+
+  if (privateKey.startsWith('0x') || privateKey.startsWith('0X')) {
+    privateKey = privateKey.slice(2);
+  }
+
+  const PRIVATE_KEY_HEX_LENGTH: number = 64;
+
+  const isHex = (value: string) => {
+    return value.match('/[0-9A-Fa-f]{6}/g');
+  }
+
+  if (!privateKey || privateKey.length != PRIVATE_KEY_HEX_LENGTH || !isHex(privateKey)) {
+    return { ok: false, error: AccountError.InvalidPrivateKey };
+  }
+
+  const publicKey = secp256k1.getPublicKey(privateKey);
+
+  return {
+    ok: true,
+    value: {
+      address: '0x' + Buffer.from(publicKey).toString('hex'),
+      privateKey: '0x' + privateKey,
+      recoveryPhrase: recoveryPhrase
+    }
+  };
+}
