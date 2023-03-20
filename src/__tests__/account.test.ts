@@ -15,8 +15,8 @@ test('createAccount', () => {
       ok: v => {
         const newAccount = v as Account;
 
-        expect(newAccount.address.startsWith('0x')).toBe(true);
-        expect(newAccount.privateKey.startsWith('0x')).toBe(true);
+        expect(newAccount.address.startsWith('0x'));
+        expect(newAccount.privateKey.startsWith('0x'));
 
         expect(newAccount.address.length).toBe('0x'.length + 130);
         expect(newAccount.privateKey.length).toBe('0x'.length + 64);
