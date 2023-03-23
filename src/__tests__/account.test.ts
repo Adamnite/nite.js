@@ -5,7 +5,7 @@
  * This code is open-sourced under the MIT license.
  */
 
-import { Account, AccountError, createAccount, getAccountFromPrivateKey } from '../accounts/account';
+import { AccountError, createAccount, getAccountFromPrivateKey } from '../accounts/account';
 import * as words from '../internal/words.json';
 import { match } from '../utils/result';
 
@@ -13,20 +13,18 @@ test('createAccount', () => {
   match(
     createAccount(), {
       ok: v => {
-        const newAccount = v as Account;
+        expect(v.address.startsWith('0x'));
+        expect(v.privateKey.startsWith('0x'));
 
-        expect(newAccount.address.startsWith('0x'));
-        expect(newAccount.privateKey.startsWith('0x'));
+        expect(v.address.length).toBe('0x'.length + 130);
+        expect(v.privateKey.length).toBe('0x'.length + 64);
 
-        expect(newAccount.address.length).toBe('0x'.length + 130);
-        expect(newAccount.privateKey.length).toBe('0x'.length + 64);
-
-        expect(newAccount.recoveryPhrase.length).toBe(24);
-        expect(newAccount.recoveryPhrase.every(
+        expect(v.recoveryPhrase.length).toBe(24);
+        expect(v.recoveryPhrase.every(
           phrase => words.includes(phrase)
         )).toBe(true);
       },
-      err: e => {
+      err: _ => {
         expect(false);
       }
     }
@@ -36,33 +34,33 @@ test('createAccount', () => {
 test('getAccountFromPrivateKey', () => {
   match(
     getAccountFromPrivateKey(''), {
-      ok: v => {
+      ok: _ => {
         expect(false);
       },
       err: e => {
-        expect(e as AccountError).toBe(AccountError.InvalidPrivateKey);
+        expect(e).toBe(AccountError.InvalidPrivateKey);
       }
     }
   );
 
   match(
     getAccountFromPrivateKey('0xd6c0c61f6db291d5638340cb09a4431e'), {
-      ok: v => {
+      ok: _ => {
         expect(false);
       },
       err: e => {
-        expect(e as AccountError).toBe(AccountError.InvalidPrivateKey);
+        expect(e).toBe(AccountError.InvalidPrivateKey);
       }
     }
   );
 
   match(
     getAccountFromPrivateKey('0xzzzzzd6c0c61f6db291d5638340cb09a'), {
-      ok: v => {
+      ok: _ => {
         expect(false);
       },
       err: e => {
-        expect(e as AccountError).toBe(AccountError.InvalidPrivateKey);
+        expect(e).toBe(AccountError.InvalidPrivateKey);
       }
     }
   );
@@ -73,17 +71,15 @@ test('getAccountFromPrivateKey', () => {
   match(
     getAccountFromPrivateKey(privateKey), {
       ok: v => {
-        const newAccount = v as Account;
+        expect(v.address).toBe(address);
+        expect(v.privateKey).toBe(privateKey);
 
-        expect(newAccount.address).toBe(address);
-        expect(newAccount.privateKey).toBe(privateKey);
-
-        expect(newAccount.recoveryPhrase.length).toBe(24);
-        expect(newAccount.recoveryPhrase.every(
+        expect(v.recoveryPhrase.length).toBe(24);
+        expect(v.recoveryPhrase.every(
           phrase => words.includes(phrase)
         )).toBe(true);
       },
-      err: e => {
+      err: _ => {
         expect(false);
       }
     }
