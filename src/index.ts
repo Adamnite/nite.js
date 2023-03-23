@@ -72,8 +72,8 @@ export class Nite {
    *
    * @returns Accounts managed by the node
    */
-  async getAccounts() : Promise<Account[]> {
-    let accounts: Account[] = [];
+  async getAccounts() : Promise<string[]> {
+    let accounts: string[] = [];
 
     /**
      * Mock few accounts for testing integration purposes.
@@ -81,20 +81,20 @@ export class Nite {
      */
     match(
       createAccount(), {
-        ok: v => { accounts.push(v); },
-        err: e => {}
+        ok: v => { accounts.push(v.address); },
+        err: _ => {}
       }
     );
     match(
       createAccount(), {
-        ok: v => { accounts.push(v); },
-        err: e => {}
+        ok: v => { accounts.push(v.address); },
+        err: _ => {}
       }
     );
     match(
       createAccount(), {
-        ok: v => { accounts.push(v); },
-        err: e => {}
+        ok: v => { accounts.push(v.address); },
+        err: _ => {}
       }
     );
 
