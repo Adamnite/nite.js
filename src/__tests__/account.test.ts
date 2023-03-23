@@ -5,7 +5,7 @@
  * This code is open-sourced under the MIT license.
  */
 
-import { AccountError, createAccount, getAccountFromPrivateKey } from '../accounts/account';
+import { AccountError, createAccount, getAccountFromPrivateKey, sign } from '../accounts/account';
 import * as words from '../internal/words.json';
 import { match } from '../utils/result';
 
@@ -25,7 +25,7 @@ test('createAccount', () => {
         )).toBe(true);
       },
       err: _ => {
-        expect(false);
+        expect(false).toBeTruthy();
       }
     }
   );
@@ -35,7 +35,7 @@ test('getAccountFromPrivateKey', () => {
   match(
     getAccountFromPrivateKey(''), {
       ok: _ => {
-        expect(false);
+        expect(false).toBeTruthy();
       },
       err: e => {
         expect(e).toBe(AccountError.InvalidPrivateKey);
@@ -46,7 +46,7 @@ test('getAccountFromPrivateKey', () => {
   match(
     getAccountFromPrivateKey('0xd6c0c61f6db291d5638340cb09a4431e'), {
       ok: _ => {
-        expect(false);
+        expect(false).toBeTruthy();
       },
       err: e => {
         expect(e).toBe(AccountError.InvalidPrivateKey);
@@ -57,7 +57,7 @@ test('getAccountFromPrivateKey', () => {
   match(
     getAccountFromPrivateKey('0xzzzzzd6c0c61f6db291d5638340cb09a'), {
       ok: _ => {
-        expect(false);
+        expect(false).toBeTruthy();
       },
       err: e => {
         expect(e).toBe(AccountError.InvalidPrivateKey);
@@ -80,7 +80,75 @@ test('getAccountFromPrivateKey', () => {
         )).toBe(true);
       },
       err: _ => {
-        expect(false);
+        expect(false).toBeTruthy();
+      }
+    }
+  );
+});
+
+test('sign', () => {
+  match(
+    sign('Test message', ''), {
+      ok: _ => {
+        expect(false).toBeTruthy();
+      },
+      err: e => {
+        expect(e).toBe(AccountError.InvalidPrivateKey);
+      }
+    }
+  );
+
+  match(
+    sign('Test message', '0xd6c0c61f6db291d5638340cb09a4431e'), {
+      ok: _ => {
+        expect(false).toBeTruthy();
+      },
+      err: e => {
+        expect(e).toBe(AccountError.InvalidPrivateKey);
+      }
+    }
+  );
+
+  match(
+    sign('Test message', '0xzzzzzd6c0c61f6db291d5638340cb09a'), {
+      ok: _ => {
+        expect(false).toBeTruthy();
+      },
+      err: e => {
+        expect(e).toBe(AccountError.InvalidPrivateKey);
+      }
+    }
+  );
+
+  match(
+    sign('Test message', 'd6c0c61f6db291d5638340cb09a4431e4a600dcb8f21e3edba103c73de9d279f'), {
+      ok: v => {
+        expect(v).toBe('0x30440220658c6c5862da3992c3acfe7c2ad2a8e623369d3a7e0828fb6a55aae1c8ccfd09022038b78224d99255eb23fe988ac28e76804ba7de8c6d469fd4633631a8075f94cb');
+      },
+      err: _ => {
+        expect(false).toBeTruthy();
+      }
+    }
+  );
+
+  match(
+    sign('Test message', '0xd6c0c61f6db291d5638340cb09a4431e4a600dcb8f21e3edba103c73de9d279f'), {
+      ok: v => {
+        expect(v).toBe('0x30440220658c6c5862da3992c3acfe7c2ad2a8e623369d3a7e0828fb6a55aae1c8ccfd09022038b78224d99255eb23fe988ac28e76804ba7de8c6d469fd4633631a8075f94cb');
+      },
+      err: _ => {
+        expect(false).toBeTruthy();
+      }
+    }
+  );
+
+  match(
+    sign('Test message', '0Xd6c0c61f6db291d5638340cb09a4431e4a600dcb8f21e3edba103c73de9d279f'), {
+      ok: v => {
+        expect(v).toBe('0x30440220658c6c5862da3992c3acfe7c2ad2a8e623369d3a7e0828fb6a55aae1c8ccfd09022038b78224d99255eb23fe988ac28e76804ba7de8c6d469fd4633631a8075f94cb');
+      },
+      err: _ => {
+        expect(false).toBeTruthy();
       }
     }
   );

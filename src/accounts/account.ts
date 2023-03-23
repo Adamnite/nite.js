@@ -7,6 +7,7 @@
 
 import { randomBytes } from '@noble/hashes/utils';
 import { sha256 } from '@noble/hashes/sha256';
+import { hmac } from '@noble/hashes/hmac';
 import * as secp256k1 from '@noble/secp256k1';
 
 import * as words from '../internal/words.json';
@@ -66,6 +67,28 @@ const getRandomRecoveryPhrase = () => {
   });
 }
 
+const isHex = (value: string) => {
+  return value.match(/[0-9A-Fa-f]{6}/g);
+}
+
+const toHex = (value: string) => {
+  let hex = ''
+  for (let i = 0; i < value.length; i++) {
+   hex += '' + value.charCodeAt(i).toString(16)
+  }
+  return hex
+}
+
+const isValidPrivateKey = (key: string) => {
+  const PRIVATE_KEY_HEX_LENGTH: number = 64;
+
+  if (key.startsWith('0x') || key.startsWith('0X')) {
+    key = key.slice(2);
+  }
+
+  return key && key.length == PRIVATE_KEY_HEX_LENGTH && isHex(key);
+}
+
 /**
  * Creates a new account.
  *
@@ -108,13 +131,7 @@ export function getAccountFromPrivateKey(privateKey: string) : Result<Account, A
     privateKey = privateKey.slice(2);
   }
 
-  const PRIVATE_KEY_HEX_LENGTH: number = 64;
-
-  const isHex = (value: string) => {
-    return value.match('/[0-9A-Fa-f]{6}/g');
-  }
-
-  if (!privateKey || privateKey.length != PRIVATE_KEY_HEX_LENGTH || !isHex(privateKey)) {
+  if (!isValidPrivateKey(privateKey)) {
     return { ok: false, error: AccountError.InvalidPrivateKey };
   }
 
@@ -127,5 +144,29 @@ export function getAccountFromPrivateKey(privateKey: string) : Result<Account, A
       privateKey: '0x' + privateKey,
       recoveryPhrase: recoveryPhrase
     }
+  };
+}
+
+/**
+ * Signs data using specified account.
+ *
+ * @param data Data to sign.
+ * @param privateKey Private key to sign the data with.
+ */
+export function sign(data: string, privateKey: string) : Result<string, AccountError> {
+  if (privateKey.startsWith('0x') || privateKey.startsWith('0X')) {
+    privateKey = privateKey.slice(2);
+  }
+
+  if (!isValidPrivateKey(privateKey)) {
+    return { ok: false, error: AccountError.InvalidPrivateKey };
+  }
+
+  secp256k1.utils.hmacSha256Sync = (k, ...m) => hmac(sha256, k, secp256k1.utils.concatBytes(...m))
+
+  const signature = secp256k1.signSync(toHex(data), privateKey);
+  return {
+    ok: true,
+    value: '0x' + Buffer.from(signature).toString('hex')
   };
 }

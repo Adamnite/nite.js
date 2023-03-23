@@ -47,7 +47,7 @@ test('getBalance', () => {
       match(
         balance, {
           ok: _ => {
-            expect(false);
+            expect(false).toBeTruthy();
           },
           err: e => {
             expect(e).toBe(NiteError.InvalidInput);
@@ -65,7 +65,7 @@ test('getBalance', () => {
           expect(isNaN(+v)); // check if value is a number
         },
         err: e => {
-          expect(false);
+          expect(false).toBeTruthy();
         }
       }
     );
