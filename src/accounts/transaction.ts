@@ -5,7 +5,7 @@
  * This code is open-sourced under the MIT license.
  */
 
-import { Result } from "../utils/result";
+import { Result } from '../utils/result';
 
 export interface Transaction {
   /**

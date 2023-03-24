@@ -5,9 +5,9 @@
  * This code is open-sourced under the MIT license.
  */
 
-import { AccountError, createAccount, getAccountFromPrivateKey, sign } from '../accounts/account';
+import { AccountError, createAccount, getAccountFromPrivateKey, sign } from '../accounts';
 import * as words from '../internal/words.json';
-import { match } from '../utils/result';
+import { match } from '../utils';
 
 test('createAccount', () => {
   match(

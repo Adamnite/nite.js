@@ -6,8 +6,8 @@
  */
 
 import { Nite, NiteError } from '../index';
-import { Provider } from '../providers/provider';
-import { match } from '../utils/result';
+import { Provider } from '../providers';
+import { match } from '../utils';
 
 export class MockProvider implements Provider {
   url: string;
