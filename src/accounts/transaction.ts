@@ -5,7 +5,7 @@
  * This code is open-sourced under the MIT license.
  */
 
-import { Result } from '../utils/result';
+import { Result, isHex, toHex } from '../utils';
 
 export interface Transaction {
   /**
@@ -52,9 +52,22 @@ export interface SignedTranscation {
 };
 
 export enum TransactionError {
+  InvalidPrivateKey,
 };
 
-export async function signTransaction(transaction: Transaction) : Promise<Result<SignedTranscation, TransactionError>> {
+export function signTransaction(transaction: Transaction, privateKey: string) : Result<SignedTranscation, TransactionError> {
+  const PRIVATE_KEY_HEX_LENGTH: number = 64;
+
+  if (privateKey.startsWith('0x') || privateKey.startsWith('0X')) {
+    privateKey = privateKey.slice(2);
+  }
+
+  if (!privateKey || privateKey.length == PRIVATE_KEY_HEX_LENGTH || !isHex(privateKey)) {
+    return { ok: false, error: TransactionError.InvalidPrivateKey };
+  }
+
+  const hexTransaction = toHex(JSON.stringify(transaction));
+
   return {
     ok: true,
     value: {
