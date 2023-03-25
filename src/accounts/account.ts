@@ -11,7 +11,7 @@ import { hmac } from '@noble/hashes/hmac';
 import * as secp256k1 from '@noble/secp256k1';
 
 import * as words from '../internal/words.json';
-import { Result } from '../utils/result';
+import { Result, isHex, toHex } from '../utils';
 
 export interface Account {
   /**
@@ -65,18 +65,6 @@ const getRandomRecoveryPhrase = () => {
     const idx = parseInt(binary, 2);
     return words[idx];
   });
-}
-
-const isHex = (value: string) => {
-  return value.match(/[0-9A-Fa-f]{6}/g);
-}
-
-const toHex = (value: string) => {
-  let hex = ''
-  for (let i = 0; i < value.length; i++) {
-   hex += '' + value.charCodeAt(i).toString(16)
-  }
-  return hex
 }
 
 const isValidPrivateKey = (key: string) => {

@@ -5,4 +5,5 @@
  * This code is open-sourced under the MIT license.
  */
 
+export * from './hex';
 export * from './result';
