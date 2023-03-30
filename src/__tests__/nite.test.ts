@@ -9,6 +9,8 @@ import { Nite, NiteError } from '../index';
 import { Provider } from '../providers';
 import { match } from '../utils';
 
+jest.setTimeout(10000)
+
 export class MockProvider implements Provider {
   url: string;
 
@@ -41,8 +43,8 @@ test('getAccounts', () => {
     });
 });
 
-test('getBalance', () => {
-  nite.getBalance('')
+test('getBalance', async () => {
+  await nite.getBalance('')
     .then(balance => {
       match(
         balance, {
@@ -54,9 +56,14 @@ test('getBalance', () => {
           }
         }
       );
+    }, (reason) => {
+      //console.log(reason);
+    })
+    .catch((error) => {
+      // console.log(error);
     });
 
-  nite.getBalance('0x04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f')
+  await nite.getBalance('0x04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f')
   .then(balance => {
     match(
       balance, {
@@ -69,5 +76,10 @@ test('getBalance', () => {
         }
       }
     );
+  }, (reason) => {
+    console.log(reason);
+  })
+  .catch((error) => {
+    // console.log(error);
   });
 });

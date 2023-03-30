@@ -5,9 +5,11 @@
  * This code is open-sourced under the MIT license.
  */
 
-import { Account, createAccount } from './accounts/account';
-import { Provider } from './providers/provider';
-import { Result, match } from './utils/result';
+import { Client, TcpClient } from 'msgpack-rpc-node';
+
+import { createAccount } from './accounts';
+import { Provider } from './providers';
+import { Result, match } from './utils';
 
 import * as packageInfo from '../package.json';
 
@@ -114,6 +116,19 @@ export class Nite {
         error: NiteError.InvalidInput
       };
     }
+
+    function hexToBytes(hex: string) {
+      let bytes = [];
+      for (let c = 0; c < hex.length; c += 2)
+        bytes.push(parseInt(hex.substr(c, 2), 16));
+      return bytes;
+    }
+
+    const client = new Client(TcpClient, 12345);
+    await client.connect();
+
+    const result = await client.call('GetChainID');
+    console.log(result);
 
     /**
      * Mock balance for testing integration purposes.
