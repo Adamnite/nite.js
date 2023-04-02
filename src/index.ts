@@ -5,14 +5,15 @@
  * This code is open-sourced under the MIT license.
  */
 
-import { createAccount } from './accounts';
 import { Provider } from './providers';
-import { Result, match } from './utils';
+import { Result } from './utils';
 
 import * as packageInfo from '../package.json';
 
 export enum NiteError {
-  InvalidInput
+  InvalidInput,
+  InvalidProvider,
+  RpcCommunicationError
 };
 
 export class Nite {
@@ -68,37 +69,32 @@ export class Nite {
   }
 
   /**
-   * Returns accounts managed by the node.
+   * Returns the Adamnite's chain ID.
    *
-   * @returns Accounts managed by the node
+   * @returns The chain ID
    */
-  async getAccounts() : Promise<string[]> {
-    let accounts: string[] = [];
+  async getChainID() : Promise<Result<string, NiteError>> {
+    if (!this.provider) {
+      return {
+        ok: false,
+        error: NiteError.InvalidProvider
+      };
+    }
 
-    /**
-     * Mock few accounts for testing integration purposes.
-     * @todo Remove once Adamnite RPC is implemented.
-     */
-    match(
-      createAccount(), {
-        ok: v => { accounts.push(v.address); },
-        err: _ => {}
-      }
-    );
-    match(
-      createAccount(), {
-        ok: v => { accounts.push(v.address); },
-        err: _ => {}
-      }
-    );
-    match(
-      createAccount(), {
-        ok: v => { accounts.push(v.address); },
-        err: _ => {}
-      }
-    );
-
-    return accounts;
+    return await this.provider.send<string>("Adamnite.GetChainID", [])
+      .then((result): Result<string, NiteError> => {
+        return {
+          ok: true,
+          value: result
+        };
+      })
+      .catch((error): Result<string, NiteError> => {
+        console.log(`RPC communication error: ${error}`);
+        return {
+          ok: false,
+          error: NiteError.RpcCommunicationError
+        };
+      });
   }
 
   /**
@@ -115,13 +111,55 @@ export class Nite {
       };
     }
 
-    /**
-     * Mock balance for testing integration purposes.
-     * @todo Remove once Adamnite RPC is implemented.
-     */
-    return {
-      ok: true,
-      value: '1000000000000'
-    };
+    if (!this.provider) {
+      return {
+        ok: false,
+        error: NiteError.InvalidProvider
+      };
+    }
+
+    return await this.provider.send<string>("Adamnite.GetBalance", [address])
+      .then((result): Result<string, NiteError>  => {
+        return {
+          ok: true,
+          value: result
+        };
+      })
+      .catch((error): Result<string, NiteError> => {
+        console.log(`RPC communication error: ${error}`);
+        return {
+          ok: false,
+          error: NiteError.RpcCommunicationError
+        }
+      });
+  }
+
+  /**
+   * Returns accounts managed by the node.
+   *
+   * @returns Accounts managed by the node
+   */
+  async getAccounts() : Promise<Result<string[], NiteError>> {
+    if (!this.provider) {
+      return {
+        ok: false,
+        error: NiteError.InvalidProvider
+      };
+    }
+
+    return await this.provider.send<string[]>("Adamnite.GetAccounts", [])
+      .then((result): Result<string[], NiteError> => {
+        return {
+          ok: true,
+          value: result
+        };
+      })
+      .catch((error): Result<string[], NiteError> => {
+        console.log(`RPC communication error: ${error}`);
+        return {
+          ok: false,
+          error: NiteError.RpcCommunicationError
+        };
+      });
   }
 }

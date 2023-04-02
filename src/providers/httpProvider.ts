@@ -26,7 +26,7 @@ export class HttpProvider implements Provider {
    * @param params Parameters to send to the RPC method
    * @returns Promise
    */
-  send<T>(method: string, params: any): Promise<T> {
+  async send<T>(method: string, params: any): Promise<T> {
     const options = {
       method: 'POST',
       headers: {
@@ -39,7 +39,7 @@ export class HttpProvider implements Provider {
       })
     };
 
-    return fetch(this.url, options)
+    return await fetch(this.url, options)
       .then(response => {
         if (!response.ok) {
           throw new Error(response.statusText);
