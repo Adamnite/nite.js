@@ -5,6 +5,8 @@
  * This code is open-sourced under the MIT license.
  */
 
+import { decode, encode } from '@msgpack/msgpack';
+
 import { Provider } from './provider';
 
 export class HttpProvider implements Provider {
@@ -20,16 +22,21 @@ export class HttpProvider implements Provider {
   /**
    * Send RPC calls over HTTP.
    *
-   * @param payload Payload to be sent
+   * @param method RPC method to be called
+   * @param params Parameters to send to the RPC method
    * @returns Promise
    */
-  send<T>(payload: string): Promise<T> {
+  send<T>(method: string, params: any): Promise<T> {
     const options = {
       method: 'POST',
-      body: payload,
       headers: {
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/x-msgpack'
+      },
+      body: JSON.stringify({
+        method,
+        params: Buffer.from(encode(params)).toString('base64'),
+        id: 0
+      })
     };
 
     return fetch(this.url, options)
@@ -37,7 +44,13 @@ export class HttpProvider implements Provider {
         if (!response.ok) {
           throw new Error(response.statusText);
         }
-        return response.json() as Promise<T>
+        return response.json();
+      })
+      .then(result => {
+        return decode(Buffer.from(result.Message, 'base64')) as Promise<T>;
+      })
+      .catch(error => {
+        throw error;
       });
   }
 };
