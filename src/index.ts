@@ -162,4 +162,34 @@ export class Nite {
         };
       });
   }
+
+  /**
+   * Adds new account.
+   *
+   * @param address Address of an account to be added
+   * @returns True if operation was successful, false otherwise
+   */
+  async addAccount(address: string) : Promise<Result<boolean, NiteError>> {
+    if (!this.provider) {
+      return {
+        ok: false,
+        error: NiteError.InvalidProvider
+      };
+    }
+
+    return await this.provider.send<boolean>("Adamnite.CreateAccount", [address])
+      .then((result): Result<boolean, NiteError> => {
+        return {
+          ok: true,
+          value: result
+        };
+      })
+      .catch((error): Result<boolean, NiteError> => {
+        console.log(`RPC communication error: ${error}`);
+        return {
+          ok: false,
+          error: NiteError.RpcCommunicationError
+        };
+      });
+  }
 }
