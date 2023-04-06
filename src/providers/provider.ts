@@ -14,8 +14,9 @@ export interface Provider {
   /**
    * Send RPC calls.
    *
-   * @param payload Payload to be sent
+   * @param method RPC method to be called
+   * @param params Parameters to send to the RPC method
    * @returns Promise
    */
-  send<T>(payload: string): Promise<T>;
+  send<T>(method: string, params: any): Promise<T>;
 };

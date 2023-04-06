@@ -6,8 +6,16 @@
  */
 
 import { Nite, NiteError } from '../index';
-import { Provider } from '../providers';
+import { HttpProvider, Provider } from '../providers';
 import { match } from '../utils';
+
+const CHAIN_ID: string = '123';
+const BALANCE: string = '10000000';
+const ACCOUNTS: string[] = [
+  '0x04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
+  '0x15c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
+  '0x26c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
+];
 
 export class MockProvider implements Provider {
   url: string;
@@ -16,9 +24,17 @@ export class MockProvider implements Provider {
     this.url = url;
   }
 
-  send<T>(payload: string): Promise<T> {
-    return new Promise<T>((resolve, reject) => {
-    });
+  async send<T>(method: string, _: any): Promise<T> {
+    if (method === 'Adamnite.GetChainID') {
+      return CHAIN_ID as T;
+    } else if (method === 'Adamnite.GetBalance') {
+      return BALANCE as T;
+    } else if (method === 'Adamnite.GetAccounts') {
+      return ACCOUNTS as T;
+    } else if (method === 'Adamnite.AddAccount') {
+      return true as T;
+    }
+    return {} as T;
   }
 };
 
@@ -30,19 +46,31 @@ test('version', () => {
   expect(nite.version).toBe(packageInfo.version);
 });
 
-test('getAccounts', () => {
-  nite.getAccounts()
-    .then(accounts => {
-      expect(accounts.length).toBeGreaterThan(0);
-      accounts.forEach(account => {
-        expect(account.startsWith('0x'));
-        expect(account.length).toBe('0x'.length + 130);
-      });
+test('getChainID', async () => {
+  await nite.getChainID()
+    .then(chainID => {
+      match(
+        chainID, {
+          ok: v => {
+            expect(v.length).toBeGreaterThan(0);
+            expect(isNaN(+v)); // check if value is a number
+            expect(v).toBe(CHAIN_ID);
+          },
+          err: _ => {
+            expect(false).toBeTruthy();
+          }
+        }
+      );
+    }, _ => {
+      expect(false).toBeTruthy();
+    })
+    .catch(_ => {
+      expect(false).toBeTruthy();
     });
 });
 
-test('getBalance', () => {
-  nite.getBalance('')
+test('getBalance', async () => {
+  await nite.getBalance('')
     .then(balance => {
       match(
         balance, {
@@ -54,20 +82,67 @@ test('getBalance', () => {
           }
         }
       );
+    }, _ => {
+      expect(false).toBeTruthy();
+    })
+    .catch(_ => {
+      expect(false).toBeTruthy();
     });
 
-  nite.getBalance('0x04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f')
-  .then(balance => {
-    match(
-      balance, {
-        ok: v => {
-          expect(v.length).toBeGreaterThan(0);
-          expect(isNaN(+v)); // check if value is a number
-        },
-        err: e => {
-          expect(false).toBeTruthy();
+  await nite.getBalance('0x04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f')
+    .then(balance => {
+      match(
+        balance, {
+          ok: v => {
+            expect(v.length).toBeGreaterThan(0);
+            expect(isNaN(+v)); // check if value is a number
+            expect(v).toBe(BALANCE);
+          },
+          err: _ => {
+            expect(false).toBeTruthy();
+          }
         }
-      }
-    );
-  });
+      );
+    }, _ => {
+      expect(false).toBeTruthy();
+    })
+    .catch(_ => {
+      expect(false).toBeTruthy();
+    });
+});
+
+test('getAccounts', async () => {
+  await nite.getAccounts()
+    .then(accounts => {
+      match(
+        accounts, {
+          ok: v => {
+            expect(v.length).toBeGreaterThan(0);
+            v.forEach(account => {
+              expect(account.startsWith('0x'));
+              expect(account.length).toBe('0x'.length + 130);
+            });
+          },
+          err: _ => {
+            expect(false).toBeTruthy();
+          }
+        }
+      )
+    });
+});
+
+test('addAccount', async () => {
+  await nite.addAccount('0x999205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f')
+    .then(result => {
+      match(
+        result, {
+          ok: v => {
+            expect(v).toBeTruthy();
+          },
+          err: _ => {
+            expect(false).toBeTruthy();
+          }
+        }
+      )
+    });
 });
