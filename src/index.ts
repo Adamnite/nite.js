@@ -170,6 +170,13 @@ export class Nite {
    * @returns True if operation was successful, false otherwise
    */
   async addAccount(address: string) : Promise<Result<boolean, NiteError>> {
+    if (!address) {
+      return {
+        ok: false,
+        error: NiteError.InvalidInput
+      };
+    }
+
     if (!this.provider) {
       return {
         ok: false,

@@ -31,7 +31,7 @@ export class MockProvider implements Provider {
       return BALANCE as T;
     } else if (method === 'Adamnite.GetAccounts') {
       return ACCOUNTS as T;
-    } else if (method === 'Adamnite.AddAccount') {
+    } else if (method === 'Adamnite.CreateAccount') {
       return true as T;
     }
     return {} as T;
@@ -128,10 +128,34 @@ test('getAccounts', async () => {
           }
         }
       )
+    }, _ => {
+      expect(false).toBeTruthy();
+    })
+    .catch(_ => {
+      expect(false).toBeTruthy();
     });
 });
 
 test('addAccount', async () => {
+  await nite.addAccount('')
+    .then(result => {
+      match(
+        result, {
+          ok: _ => {
+            expect(false).toBeTruthy();
+          },
+          err: e => {
+            expect(e).toBe(NiteError.InvalidInput);
+          }
+        }
+      )
+    }, _ => {
+      expect(false).toBeTruthy();
+    })
+    .catch(_ => {
+      expect(false).toBeTruthy();
+    });
+
   await nite.addAccount('0x999205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f')
     .then(result => {
       match(
@@ -144,5 +168,10 @@ test('addAccount', async () => {
           }
         }
       )
+    }, _ => {
+      expect(false).toBeTruthy();
+    })
+    .catch(_ => {
+      expect(false).toBeTruthy();
     });
 });
