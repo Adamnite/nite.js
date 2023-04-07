@@ -89,6 +89,44 @@ test('getBalance', async () => {
       expect(false).toBeTruthy();
     });
 
+  await nite.getBalance('0x04c205aa76174a126606bc6f411a1ee421e6c2219')
+    .then(balance => {
+      match(
+        balance, {
+          ok: _ => {
+            expect(false).toBeTruthy();
+          },
+          err: e => {
+            expect(e).toBe(NiteError.InvalidInput);
+          }
+        }
+      );
+    }, _ => {
+      expect(false).toBeTruthy();
+    })
+    .catch(_ => {
+      expect(false).toBeTruthy();
+    });
+
+  await nite.getBalance('04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f')
+    .then(balance => {
+      match(
+        balance, {
+          ok: _ => {
+            expect(false).toBeTruthy();
+          },
+          err: e => {
+            expect(e).toBe(NiteError.InvalidInput);
+          }
+        }
+      );
+    }, _ => {
+      expect(false).toBeTruthy();
+    })
+    .catch(_ => {
+      expect(false).toBeTruthy();
+    });
+
   await nite.getBalance('0x04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f')
     .then(balance => {
       match(

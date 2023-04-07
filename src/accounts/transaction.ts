@@ -62,7 +62,7 @@ export function signTransaction(transaction: Transaction, privateKey: string) : 
     privateKey = privateKey.slice(2);
   }
 
-  if (!privateKey || privateKey.length == PRIVATE_KEY_HEX_LENGTH || !isHex(privateKey)) {
+  if (!privateKey || privateKey.length != PRIVATE_KEY_HEX_LENGTH || !isHex(privateKey)) {
     return { ok: false, error: TransactionError.InvalidPrivateKey };
   }
 

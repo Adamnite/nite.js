@@ -6,7 +6,7 @@
  */
 
 import { Provider } from './providers';
-import { Result } from './utils';
+import { isHex, Result } from './utils';
 
 import * as packageInfo from '../package.json';
 
@@ -14,6 +14,15 @@ export enum NiteError {
   InvalidInput,
   InvalidProvider,
   RpcCommunicationError
+};
+
+const isValidAddress = (address: string) => {
+  const ADDRESS_HEX_LENGTH: number = 130;
+
+  return address
+    && (address.startsWith('0x') || address.startsWith('0X'))
+    && address.length == ADDRESS_HEX_LENGTH + 2
+    && isHex(address);
 };
 
 export class Nite {
@@ -104,7 +113,7 @@ export class Nite {
    * @returns The current balance for the given address
    */
   async getBalance(address: string) : Promise<Result<string, NiteError>> {
-    if (!address) {
+    if (!isValidAddress(address)) {
       return {
         ok: false,
         error: NiteError.InvalidInput
@@ -170,7 +179,7 @@ export class Nite {
    * @returns True if operation was successful, false otherwise
    */
   async addAccount(address: string) : Promise<Result<boolean, NiteError>> {
-    if (!address) {
+    if (!isValidAddress(address)) {
       return {
         ok: false,
         error: NiteError.InvalidInput
