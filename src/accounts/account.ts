@@ -5,7 +5,10 @@
  * This code is open-sourced under the MIT license.
  */
 
+import { base58 } from '@scure/base';
 import { randomBytes } from '@noble/hashes/utils';
+import { ripemd160 } from '@noble/hashes/ripemd160';
+import { sha512 } from '@noble/hashes/sha512';
 import { sha256 } from '@noble/hashes/sha256';
 import { hmac } from '@noble/hashes/hmac';
 import * as secp256k1 from '@noble/secp256k1';
@@ -15,9 +18,14 @@ import { Result, isHex, toHex } from '../utils';
 
 export interface Account {
   /**
-   * Account's address i.e. public key of SECP256k1 elliptic curve.
+   * Account's address.
    */
   address: string;
+
+  /**
+   * Account's public key of SECP256k1 elliptic curve.
+   */
+  publicKey: string;
 
   /**
    * Account's private key of SECP256k1 elliptic curve.
@@ -77,6 +85,10 @@ const isValidPrivateKey = (key: string) => {
   return key && key.length == PRIVATE_KEY_HEX_LENGTH && isHex(key);
 }
 
+const createAddress = (publicKey: Uint8Array) => {
+  return base58.encode(ripemd160(sha512(publicKey).slice(16)));
+}
+
 /**
  * Creates a new account.
  *
@@ -95,7 +107,8 @@ export function createAccount() : Result<Account, AccountError> {
   return {
     ok: true,
     value: {
-      address: '0x' + Buffer.from(publicKey).toString('hex'),
+      address: Buffer.from(createAddress(publicKey)).toString(),
+      publicKey: '0x' + Buffer.from(publicKey).toString('hex'),
       privateKey: '0x' + Buffer.from(privateKey).toString('hex'),
       recoveryPhrase: recoveryPhrase
     }
@@ -128,7 +141,8 @@ export function getAccountFromPrivateKey(privateKey: string) : Result<Account, A
   return {
     ok: true,
     value: {
-      address: '0x' + Buffer.from(publicKey).toString('hex'),
+      address: Buffer.from(createAddress(publicKey)).toString(),
+      publicKey: '0x' + Buffer.from(publicKey).toString('hex'),
       privateKey: '0x' + privateKey,
       recoveryPhrase: recoveryPhrase
     }
