@@ -5,7 +5,7 @@
  * This code is open-sourced under the MIT license.
  */
 
-import { Result, isHex, toHex } from '../utils';
+import { Result, toHex, isValidPrivateKey } from '../utils';
 
 export interface Transaction {
   /**
@@ -56,13 +56,11 @@ export enum TransactionError {
 };
 
 export function signTransaction(transaction: Transaction, privateKey: string) : Result<SignedTranscation, TransactionError> {
-  const PRIVATE_KEY_HEX_LENGTH: number = 64;
-
   if (privateKey.startsWith('0x') || privateKey.startsWith('0X')) {
     privateKey = privateKey.slice(2);
   }
 
-  if (!privateKey || privateKey.length != PRIVATE_KEY_HEX_LENGTH || !isHex(privateKey)) {
+  if (!isValidPrivateKey(privateKey)) {
     return { ok: false, error: TransactionError.InvalidPrivateKey };
   }
 

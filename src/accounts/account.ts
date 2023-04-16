@@ -14,7 +14,7 @@ import { hmac } from '@noble/hashes/hmac';
 import * as secp256k1 from '@noble/secp256k1';
 
 import * as words from '../internal/words.json';
-import { Result, isHex, toHex } from '../utils';
+import { Result, toHex, isValidPrivateKey } from '../utils';
 
 export interface Account {
   /**
@@ -73,16 +73,6 @@ const getRandomRecoveryPhrase = () => {
     const idx = parseInt(binary, 2);
     return words[idx];
   });
-}
-
-const isValidPrivateKey = (key: string) => {
-  const PRIVATE_KEY_HEX_LENGTH: number = 64;
-
-  if (key.startsWith('0x') || key.startsWith('0X')) {
-    key = key.slice(2);
-  }
-
-  return key && key.length == PRIVATE_KEY_HEX_LENGTH && isHex(key);
 }
 
 const createAddress = (publicKey: Uint8Array) => {
