@@ -5,6 +5,7 @@
  * This code is open-sourced under the MIT license.
  */
 
+import { SignedTranscation } from './accounts';
 import { Provider } from './providers';
 import { isHex, Result } from './utils';
 
@@ -194,6 +195,30 @@ export class Nite {
     }
 
     return await this.provider.send<boolean>("Adamnite.CreateAccount", [address])
+      .then((result): Result<boolean, NiteError> => {
+        return {
+          ok: true,
+          value: result
+        };
+      })
+      .catch((error): Result<boolean, NiteError> => {
+        console.log(`RPC communication error: ${error}`);
+        return {
+          ok: false,
+          error: NiteError.RpcCommunicationError
+        };
+      });
+  }
+
+  async sendTransaction(transaction: SignedTranscation) : Promise<Result<boolean, NiteError>> {
+    if (!this.provider) {
+      return {
+        ok: false,
+        error: NiteError.InvalidProvider
+      };
+    }
+
+    return await this.provider.send<boolean>("Adamnite.SendTransaction", [transaction])
       .then((result): Result<boolean, NiteError> => {
         return {
           ok: true,

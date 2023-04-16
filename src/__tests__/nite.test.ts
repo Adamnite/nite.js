@@ -33,6 +33,8 @@ export class MockProvider implements Provider {
       return ACCOUNTS as T;
     } else if (method === 'Adamnite.CreateAccount') {
       return true as T;
+    } else if (method === 'Adamnite.SendTransaction') {
+      return true as T;
     }
     return {} as T;
   }
@@ -195,6 +197,30 @@ test('addAccount', async () => {
     });
 
   await nite.addAccount('0x999205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f')
+    .then(result => {
+      match(
+        result, {
+          ok: v => {
+            expect(v).toBeTruthy();
+          },
+          err: _ => {
+            expect(false).toBeTruthy();
+          }
+        }
+      )
+    }, _ => {
+      expect(false).toBeTruthy();
+    })
+    .catch(_ => {
+      expect(false).toBeTruthy();
+    });
+});
+
+test('sendTransaction', async () => {
+  await nite.sendTransaction({
+    messageHash: '0x999205aa76174a126606bc6f411a1ee421e6c',
+    rawTransaction: '0x7712205aa76174a126606bc6f411a1ee421e6c'
+  })
     .then(result => {
       match(
         result, {
