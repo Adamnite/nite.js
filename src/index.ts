@@ -218,7 +218,7 @@ export class Nite {
       };
     }
 
-    return await this.provider.send<boolean>("Adamnite.SendTransaction", [transaction])
+    return await this.provider.send<boolean>("Adamnite.SendTransaction", [transaction.hash, transaction.raw])
       .then((result): Result<boolean, NiteError> => {
         return {
           ok: true,

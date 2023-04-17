@@ -218,8 +218,8 @@ test('addAccount', async () => {
 
 test('sendTransaction', async () => {
   await nite.sendTransaction({
-    messageHash: '0x999205aa76174a126606bc6f411a1ee421e6c',
-    rawTransaction: '0x7712205aa76174a126606bc6f411a1ee421e6c'
+    hash: '0x999205aa76174a126606bc6f411a1ee421e6c',
+    raw: '0x7712205aa76174a126606bc6f411a1ee421e6c'
   })
     .then(result => {
       match(
