@@ -5,6 +5,10 @@
  * This code is open-sourced under the MIT license.
  */
 
+import { sha256 } from '@noble/hashes/sha256';
+import { hmac } from '@noble/hashes/hmac';
+import * as secp256k1 from '@noble/secp256k1';
+
 import { Result, toHex, isValidPrivateKey } from '../utils';
 
 export interface Transaction {
@@ -43,12 +47,12 @@ export interface SignedTranscation {
   /**
    * Hash of the given message.
    */
-  messageHash: string;
+  hash: string;
 
   /**
    * Encoded transaction.
    */
-  rawTransaction: string;
+  raw: string;
 };
 
 export enum TransactionError {
@@ -64,13 +68,15 @@ export function signTransaction(transaction: Transaction, privateKey: string) : 
     return { ok: false, error: TransactionError.InvalidPrivateKey };
   }
 
-  const hexTransaction = toHex(JSON.stringify(transaction));
+  const rawTransaction = toHex(JSON.stringify(transaction));
+
+  secp256k1.utils.hmacSha256Sync = (k, ...m) => hmac(sha256, k, secp256k1.utils.concatBytes(...m))
 
   return {
     ok: true,
     value: {
-      messageHash: '',
-      rawTransaction: '',
+      hash: '0x' + Buffer.from(secp256k1.signSync(rawTransaction, privateKey)).toString('hex'),
+      raw: rawTransaction,
     }
   };
 }

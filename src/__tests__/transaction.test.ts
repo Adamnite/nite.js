@@ -28,4 +28,16 @@ test('signTransaction', () => {
       }
     }
   );
+
+  match(
+    signTransaction(transaction, '0xd6c0c61f6db291d5638340cb09a4431e4a600dcb8f21e3edba103c73de9d279f'), {
+      ok: v => {
+        expect(v.hash.startsWith('0x'));
+        expect(v.raw.startsWith('0x'));
+      },
+      err: e => {
+        expect(false).toBeTruthy();
+      }
+    }
+  );
 });
