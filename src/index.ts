@@ -211,6 +211,13 @@ export class Nite {
   }
 
   async sendTransaction(transaction: SignedTranscation) : Promise<Result<boolean, NiteError>> {
+    if (!transaction.hash || !transaction.raw) {
+      return {
+        ok: false,
+        error: NiteError.InvalidInput
+      };
+    }
+
     if (!this.provider) {
       return {
         ok: false,

@@ -217,6 +217,25 @@ test('addAccount', async () => {
 });
 
 test('sendTransaction', async () => {
+  await nite.sendTransaction({ hash: '', raw: '' })
+    .then(result => {
+      match(
+        result, {
+          ok: _ => {
+            expect(false).toBeTruthy();
+          },
+          err: e => {
+            expect(e).toBe(NiteError.InvalidInput);
+          }
+        }
+      )
+    }, _ => {
+      expect(false).toBeTruthy();
+    })
+    .catch(_ => {
+      expect(false).toBeTruthy();
+    });
+
   await nite.sendTransaction({
     hash: '0x999205aa76174a126606bc6f411a1ee421e6c',
     raw: '0x7712205aa76174a126606bc6f411a1ee421e6c'
