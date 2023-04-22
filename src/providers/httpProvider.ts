@@ -26,7 +26,7 @@ export class HttpProvider implements Provider {
    * @param params Parameters to send to the RPC method
    * @returns Promise
    */
-  async send<T>(method: string, params: any): Promise<T> {
+  async send<T>(method: string, params: any[]): Promise<T> {
     const options = {
       method: 'POST',
       headers: {
@@ -34,8 +34,7 @@ export class HttpProvider implements Provider {
       },
       body: JSON.stringify({
         method,
-        params: Buffer.from(encode(params)).toString('base64'),
-        id: 0
+        params: Array.from(encode(params))
       })
     };
 
@@ -44,10 +43,10 @@ export class HttpProvider implements Provider {
         if (!response.ok) {
           throw new Error(response.statusText);
         }
-        return response.json();
+        return response.arrayBuffer();
       })
       .then(result => {
-        return decode(Buffer.from(result.Message, 'base64')) as Promise<T>;
+        return decode(result) as Promise<T>;
       })
       .catch(error => {
         throw error;
