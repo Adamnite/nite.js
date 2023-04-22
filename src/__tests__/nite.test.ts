@@ -12,9 +12,9 @@ import { match } from '../utils';
 const CHAIN_ID: string = '123';
 const BALANCE: string = '10000000';
 const ACCOUNTS: string[] = [
-  '0x04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
-  '0x15c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
-  '0x26c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
+  '23m3Ho7PwouaFzU8iXMLo7Pwoadf',
+  '8iXMLygwuXNW7zU8iXMLygwuXNW7',
+  '69m3Ho7PwouaFzU69m3Ho7PwouaF',
 ];
 
 export class MockProvider implements Provider {
@@ -91,7 +91,7 @@ test('getBalance', async () => {
       expect(false).toBeTruthy();
     });
 
-  await nite.getBalance('0x04c205aa76174a126606bc6f411a1ee421e6c2219')
+  await nite.getBalance('23m3Ho7PwouaFz')
     .then(balance => {
       match(
         balance, {
@@ -110,26 +110,7 @@ test('getBalance', async () => {
       expect(false).toBeTruthy();
     });
 
-  await nite.getBalance('04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f')
-    .then(balance => {
-      match(
-        balance, {
-          ok: _ => {
-            expect(false).toBeTruthy();
-          },
-          err: e => {
-            expect(e).toBe(NiteError.InvalidInput);
-          }
-        }
-      );
-    }, _ => {
-      expect(false).toBeTruthy();
-    })
-    .catch(_ => {
-      expect(false).toBeTruthy();
-    });
-
-  await nite.getBalance('0x04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f')
+  await nite.getBalance('23m3Ho7PwouaFzU8iXMLygwuXNW7')
     .then(balance => {
       match(
         balance, {
@@ -159,8 +140,7 @@ test('getAccounts', async () => {
           ok: v => {
             expect(v.length).toBeGreaterThan(0);
             v.forEach(account => {
-              expect(account.startsWith('0x'));
-              expect(account.length).toBe('0x'.length + 130);
+              expect(account.length).toBe(28);
             });
           },
           err: _ => {
@@ -196,7 +176,7 @@ test('addAccount', async () => {
       expect(false).toBeTruthy();
     });
 
-  await nite.addAccount('0x999205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f')
+  await nite.addAccount('23m3Ho7PwouaFzU8iXMLygwuXNW7')
     .then(result => {
       match(
         result, {

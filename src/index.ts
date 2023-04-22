@@ -7,7 +7,7 @@
 
 import { SignedTranscation } from './accounts';
 import { Provider } from './providers';
-import { isHex, Result } from './utils';
+import { Result } from './utils';
 
 import * as packageInfo from '../package.json';
 
@@ -18,12 +18,8 @@ export enum NiteError {
 };
 
 const isValidAddress = (address: string) => {
-  const ADDRESS_HEX_LENGTH: number = 130;
-
-  return address
-    && (address.startsWith('0x') || address.startsWith('0X'))
-    && address.length == ADDRESS_HEX_LENGTH + 2
-    && isHex(address);
+  const ADDRESS_LENGTH: number = 28;
+  return address && address.length == ADDRESS_LENGTH;
 };
 
 export class Nite {
