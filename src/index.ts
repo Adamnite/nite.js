@@ -13,6 +13,7 @@ import * as packageInfo from '../package.json';
 
 export enum NiteError {
   InvalidInput,
+  InvalidMessage,
   InvalidProvider,
   RpcCommunicationError
 };
@@ -227,7 +228,44 @@ export class Nite {
       };
     }
 
-    return await this.provider.send<boolean>("Adamnite.SendTransaction", [transaction.hash, transaction.raw])
+    return await this.provider.send<boolean>("AdamniteServer.SendTransaction", [transaction.hash, transaction.raw])
+      .then((result): Result<boolean, NiteError> => {
+        return {
+          ok: true,
+          value: result
+        };
+      })
+      .catch((error): Result<boolean, NiteError> => {
+        console.log(`RPC communication error: ${error}`);
+        return {
+          ok: false,
+          error: NiteError.RpcCommunicationError
+        };
+      });
+  }
+
+  /**
+   * Sends Caesar message.
+   *
+   * @param message Caesar message
+   * @returns True if operation was successful, false otherwise
+   */
+  async sendMessage(message: string) : Promise<Result<boolean, NiteError>> {
+    if (!message) {
+      return {
+        ok: false,
+        error: NiteError.InvalidMessage
+      };
+    }
+
+    if (!this.provider) {
+      return {
+        ok: false,
+        error: NiteError.InvalidProvider
+      };
+    }
+
+    return await this.provider.send<boolean>("AdamniteServer.NewCaesarMessage", [message])
       .then((result): Result<boolean, NiteError> => {
         return {
           ok: true,

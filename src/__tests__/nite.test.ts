@@ -35,6 +35,8 @@ export class MockProvider implements Provider {
       return true as T;
     } else if (method === 'AdamniteServer.SendTransaction') {
       return true as T;
+    } else if (method === 'AdamniteServer.NewCaesarMessage') {
+      return true as T;
     }
     return {} as T;
   }
@@ -220,6 +222,46 @@ test('sendTransaction', async () => {
     hash: '0x999205aa76174a126606bc6f411a1ee421e6c',
     raw: '0x7712205aa76174a126606bc6f411a1ee421e6c'
   })
+    .then(result => {
+      match(
+        result, {
+          ok: v => {
+            expect(v).toBeTruthy();
+          },
+          err: _ => {
+            expect(false).toBeTruthy();
+          }
+        }
+      )
+    }, _ => {
+      expect(false).toBeTruthy();
+    })
+    .catch(_ => {
+      expect(false).toBeTruthy();
+    });
+});
+
+test('sendMessage', async () => {
+  await nite.sendMessage('')
+    .then(result => {
+      match(
+        result, {
+          ok: _ => {
+            expect(false).toBeTruthy();
+          },
+          err: e => {
+            expect(e).toBe(NiteError.InvalidMessage);
+          }
+        }
+      )
+    }, _ => {
+      expect(false).toBeTruthy();
+    })
+    .catch(_ => {
+      expect(false).toBeTruthy();
+    });
+
+  await nite.sendMessage('Hello, world!')
     .then(result => {
       match(
         result, {
