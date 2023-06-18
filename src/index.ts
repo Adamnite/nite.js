@@ -88,7 +88,7 @@ export class Nite {
       };
     }
 
-    return await this.provider.send<string>("AdamniteServer.GetChainID", [])
+    return await this.provider.send<string>('AdamniteServer.GetChainID', [])
       .then((result): Result<string, NiteError> => {
         return {
           ok: true,
@@ -125,7 +125,7 @@ export class Nite {
       };
     }
 
-    return await this.provider.send<string>("AdamniteServer.GetBalance", [address])
+    return await this.provider.send<string>('AdamniteServer.GetBalance', [address])
       .then((result): Result<string, NiteError>  => {
         return {
           ok: true,
@@ -154,7 +154,7 @@ export class Nite {
       };
     }
 
-    return await this.provider.send<string[]>("AdamniteServer.GetAccounts", [])
+    return await this.provider.send<string[]>('AdamniteServer.GetAccounts', [])
       .then((result): Result<string[], NiteError> => {
         return {
           ok: true,
@@ -191,7 +191,7 @@ export class Nite {
       };
     }
 
-    return await this.provider.send<boolean>("AdamniteServer.CreateAccount", [address])
+    return await this.provider.send<boolean>('AdamniteServer.CreateAccount', [address])
       .then((result): Result<boolean, NiteError> => {
         return {
           ok: true,
@@ -228,7 +228,7 @@ export class Nite {
       };
     }
 
-    return await this.provider.send<boolean>("AdamniteServer.SendTransaction", [transaction.hash, transaction.raw])
+    return await this.provider.send<boolean>('AdamniteServer.SendTransaction', [transaction.hash, transaction.raw])
       .then((result): Result<boolean, NiteError> => {
         return {
           ok: true,
@@ -265,7 +265,7 @@ export class Nite {
       };
     }
 
-    return await this.provider.send<boolean>("AdamniteServer.NewCaesarMessage", [message])
+    return await this.provider.send<boolean>('AdamniteServer.NewCaesarMessage', [message])
       .then((result): Result<boolean, NiteError> => {
         return {
           ok: true,
