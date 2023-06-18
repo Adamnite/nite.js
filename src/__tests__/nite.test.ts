@@ -25,15 +25,15 @@ export class MockProvider implements Provider {
   }
 
   async send<T>(method: string, _: any): Promise<T> {
-    if (method === 'Adamnite.GetChainID') {
+    if (method === 'AdamniteServer.GetChainID') {
       return CHAIN_ID as T;
-    } else if (method === 'Adamnite.GetBalance') {
+    } else if (method === 'AdamniteServer.GetBalance') {
       return BALANCE as T;
-    } else if (method === 'Adamnite.GetAccounts') {
+    } else if (method === 'AdamniteServer.GetAccounts') {
       return ACCOUNTS as T;
-    } else if (method === 'Adamnite.CreateAccount') {
+    } else if (method === 'AdamniteServer.CreateAccount') {
       return true as T;
-    } else if (method === 'Adamnite.SendTransaction') {
+    } else if (method === 'AdamniteServer.SendTransaction') {
       return true as T;
     }
     return {} as T;
