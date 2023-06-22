@@ -5,7 +5,7 @@
  * This code is open-sourced under the MIT license.
  */
 
-import { signTransaction, TransactionError } from "../accounts";
+import { signTransaction, TransactionError } from '../accounts';
 import { match } from '../utils';
 
 const transaction = {

@@ -5,7 +5,7 @@
  * This code is open-sourced under the MIT license.
  */
 
-import { isHex } from "./hex";
+import { isHex } from './hex';
 
 export function isValidPrivateKey(key: string) {
   const PRIVATE_KEY_HEX_LENGTH: number = 64;
@@ -14,5 +14,5 @@ export function isValidPrivateKey(key: string) {
     key = key.slice(2);
   }
 
-  return key && key.length == PRIVATE_KEY_HEX_LENGTH && isHex(key);
+  return key && key.length === PRIVATE_KEY_HEX_LENGTH && isHex(key);
 }
