@@ -14,5 +14,5 @@ export function isValidPrivateKey(key: string) {
     key = key.slice(2);
   }
 
-  return key && key.length == PRIVATE_KEY_HEX_LENGTH && isHex(key);
+  return key && key.length === PRIVATE_KEY_HEX_LENGTH && isHex(key);
 }

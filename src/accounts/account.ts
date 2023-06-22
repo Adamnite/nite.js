@@ -53,7 +53,7 @@ const getRandomRecoveryPhrase = () => {
 
   const toBinary = (bytes: Uint8Array) => {
     let binary = '';
-    for (let i in bytes) {
+    for (const i in bytes) {
       binary += padLeft(bytes[i].toString(2), '0', 8);
     }
     return binary;
@@ -100,7 +100,7 @@ export function createAccount() : Result<Account, AccountError> {
       address: Buffer.from(createAddress(publicKey)).toString(),
       publicKey: '0x' + Buffer.from(publicKey).toString('hex'),
       privateKey: '0x' + Buffer.from(privateKey).toString('hex'),
-      recoveryPhrase: recoveryPhrase
+      recoveryPhrase
     }
   };
 };
@@ -134,7 +134,7 @@ export function getAccountFromPrivateKey(privateKey: string) : Result<Account, A
       address: Buffer.from(createAddress(publicKey)).toString(),
       publicKey: '0x' + Buffer.from(publicKey).toString('hex'),
       privateKey: '0x' + privateKey,
-      recoveryPhrase: recoveryPhrase
+      recoveryPhrase
     }
   };
 }

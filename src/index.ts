@@ -22,12 +22,12 @@ export enum NiteError {
 
 const isValidAddress = (address: string) => {
   const ADDRESS_LENGTH: number = 28;
-  return address && address.length == ADDRESS_LENGTH;
+  return address && address.length === ADDRESS_LENGTH;
 };
 
 const isValidHexPublicKey = (key: string) => {
   const HEX_PUBLIC_KEY_LENGTH: number = 130;
-  return key && key.length == HEX_PUBLIC_KEY_LENGTH && isHex(key);
+  return key && key.length === HEX_PUBLIC_KEY_LENGTH && isHex(key);
 };
 
 export class Nite {
