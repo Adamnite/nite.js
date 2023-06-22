@@ -7,7 +7,7 @@
 
 import { SignedTranscation } from './accounts';
 import { Provider } from './providers';
-import { Result } from './utils';
+import { isHex, Result } from './utils';
 
 import * as packageInfo from '../package.json';
 
@@ -15,12 +15,19 @@ export enum NiteError {
   InvalidInput,
   InvalidMessage,
   InvalidProvider,
+  InvalidReceiverPublicKey,
+  InvalidSenderPublicKey,
   RpcCommunicationError
 };
 
 const isValidAddress = (address: string) => {
   const ADDRESS_LENGTH: number = 28;
   return address && address.length == ADDRESS_LENGTH;
+};
+
+const isValidHexPublicKey = (key: string) => {
+  const HEX_PUBLIC_KEY_LENGTH: number = 130;
+  return key && key.length == HEX_PUBLIC_KEY_LENGTH && isHex(key);
 };
 
 export class Nite {
@@ -88,7 +95,7 @@ export class Nite {
       };
     }
 
-    return await this.provider.send<string>('AdamniteServer.GetChainID', [])
+    return await this.provider.send<string>('BouncerServer.GetChainID', [])
       .then((result): Result<string, NiteError> => {
         return {
           ok: true,
@@ -125,7 +132,7 @@ export class Nite {
       };
     }
 
-    return await this.provider.send<string>('AdamniteServer.GetBalance', [address])
+    return await this.provider.send<string>('BouncerServer.GetBalance', [address])
       .then((result): Result<string, NiteError>  => {
         return {
           ok: true,
@@ -154,7 +161,7 @@ export class Nite {
       };
     }
 
-    return await this.provider.send<string[]>('AdamniteServer.GetAccounts', [])
+    return await this.provider.send<string[]>('BouncerServer.GetAccounts', [])
       .then((result): Result<string[], NiteError> => {
         return {
           ok: true,
@@ -191,7 +198,7 @@ export class Nite {
       };
     }
 
-    return await this.provider.send<boolean>('AdamniteServer.CreateAccount', [address])
+    return await this.provider.send<boolean>('BouncerServer.CreateAccount', [address])
       .then((result): Result<boolean, NiteError> => {
         return {
           ok: true,
@@ -228,7 +235,7 @@ export class Nite {
       };
     }
 
-    return await this.provider.send<boolean>('AdamniteServer.SendTransaction', [transaction.hash, transaction.raw])
+    return await this.provider.send<boolean>('BouncerServer.SendTransaction', [transaction.hash, transaction.raw])
       .then((result): Result<boolean, NiteError> => {
         return {
           ok: true,
@@ -247,17 +254,12 @@ export class Nite {
   /**
    * Sends Caesar message.
    *
+   * @param toPublicKey Public key of receiver
+   * @param fromPublicKey Public key of sender
    * @param message Caesar message
    * @returns True if operation was successful, false otherwise
    */
-  async sendMessage(message: string) : Promise<Result<boolean, NiteError>> {
-    if (!message) {
-      return {
-        ok: false,
-        error: NiteError.InvalidMessage
-      };
-    }
-
+  async sendMessage(toPublicKey: string, fromPublicKey: string, message: string) : Promise<Result<boolean, NiteError>> {
     if (!this.provider) {
       return {
         ok: false,
@@ -265,7 +267,34 @@ export class Nite {
       };
     }
 
-    return await this.provider.send<boolean>('AdamniteServer.NewCaesarMessage', [message])
+    if (toPublicKey.startsWith('0x') || toPublicKey.startsWith('0X')) {
+      toPublicKey = toPublicKey.slice(2);
+    }
+    if (fromPublicKey.startsWith('0x') || fromPublicKey.startsWith('0X')) {
+      fromPublicKey = fromPublicKey.slice(2);
+    }
+
+    if (!isValidHexPublicKey(toPublicKey)) {
+      return {
+        ok: false,
+        error: NiteError.InvalidReceiverPublicKey
+      };
+    }
+    if (!isValidHexPublicKey(fromPublicKey)) {
+      return {
+        ok: false,
+        error: NiteError.InvalidSenderPublicKey
+      };
+    }
+
+    if (!message) {
+      return {
+        ok: false,
+        error: NiteError.InvalidMessage
+      };
+    }
+
+    return await this.provider.send<boolean>('BouncerServer.NewMessage', [toPublicKey, fromPublicKey, message])
       .then((result): Result<boolean, NiteError> => {
         return {
           ok: true,

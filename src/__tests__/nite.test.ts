@@ -25,17 +25,17 @@ export class MockProvider implements Provider {
   }
 
   async send<T>(method: string, _: any): Promise<T> {
-    if (method === 'AdamniteServer.GetChainID') {
+    if (method === 'BouncerServer.GetChainID') {
       return CHAIN_ID as T;
-    } else if (method === 'AdamniteServer.GetBalance') {
+    } else if (method === 'BouncerServer.GetBalance') {
       return BALANCE as T;
-    } else if (method === 'AdamniteServer.GetAccounts') {
+    } else if (method === 'BouncerServer.GetAccounts') {
       return ACCOUNTS as T;
-    } else if (method === 'AdamniteServer.CreateAccount') {
+    } else if (method === 'BouncerServer.CreateAccount') {
       return true as T;
-    } else if (method === 'AdamniteServer.SendTransaction') {
+    } else if (method === 'BouncerServer.SendTransaction') {
       return true as T;
-    } else if (method === 'AdamniteServer.NewCaesarMessage') {
+    } else if (method === 'BouncerServer.NewCaesarMessage') {
       return true as T;
     }
     return {} as T;
@@ -242,7 +242,54 @@ test('sendTransaction', async () => {
 });
 
 test('sendMessage', async () => {
-  await nite.sendMessage('')
+  await nite.sendMessage('', '', '')
+    .then(result => {
+      match(
+        result, {
+          ok: _ => {
+            expect(false).toBeTruthy();
+          },
+          err: e => {
+            expect(e).toBe(NiteError.InvalidReceiverPublicKey);
+          }
+        }
+      )
+    }, _ => {
+      expect(false).toBeTruthy();
+    })
+    .catch(_ => {
+      expect(false).toBeTruthy();
+    });
+
+  await nite.sendMessage(
+    '0x04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
+    '',
+    ''
+  )
+    .then(result => {
+      match(
+        result, {
+          ok: _ => {
+            expect(false).toBeTruthy();
+          },
+          err: e => {
+            expect(e).toBe(NiteError.InvalidSenderPublicKey);
+          }
+        }
+      )
+    }, _ => {
+      expect(false).toBeTruthy();
+    })
+    .catch(_ => {
+      expect(false).toBeTruthy();
+    });
+
+
+  await nite.sendMessage(
+    '0x04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
+    '0x55c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
+    ''
+  )
     .then(result => {
       match(
         result, {
@@ -261,7 +308,11 @@ test('sendMessage', async () => {
       expect(false).toBeTruthy();
     });
 
-  await nite.sendMessage('Hello, world!')
+  await nite.sendMessage(
+    '0x04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
+    '0x55c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
+    'Hello, world!'
+  )
     .then(result => {
       match(
         result, {
