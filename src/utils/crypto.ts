@@ -7,7 +7,7 @@
 
 import { isHex } from './hex';
 
-export function isValidPrivateKey(key: string) {
+export function isValidHexPrivateKey(key: string) {
   const PRIVATE_KEY_HEX_LENGTH: number = 64;
 
   if (key.startsWith('0x') || key.startsWith('0X')) {

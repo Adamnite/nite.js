@@ -9,7 +9,7 @@ import { sha256 } from '@noble/hashes/sha256';
 import { hmac } from '@noble/hashes/hmac';
 import * as secp256k1 from '@noble/secp256k1';
 
-import { Result, toHex, isValidPrivateKey } from '../utils';
+import { Result, toHex, isValidHexPrivateKey } from '../utils';
 
 export interface Transaction {
   /**
@@ -64,13 +64,13 @@ export function signTransaction(transaction: Transaction, privateKey: string) : 
     privateKey = privateKey.slice(2);
   }
 
-  if (!isValidPrivateKey(privateKey)) {
+  if (!isValidHexPrivateKey(privateKey)) {
     return { ok: false, error: TransactionError.InvalidPrivateKey };
   }
 
   const rawTransaction = toHex(JSON.stringify(transaction));
 
-  secp256k1.utils.hmacSha256Sync = (k, ...m) => hmac(sha256, k, secp256k1.utils.concatBytes(...m))
+  secp256k1.utils.hmacSha256Sync = (k, ...m) => hmac(sha256, k, secp256k1.utils.concatBytes(...m));
 
   return {
     ok: true,

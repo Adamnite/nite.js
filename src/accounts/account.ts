@@ -14,7 +14,7 @@ import { hmac } from '@noble/hashes/hmac';
 import * as secp256k1 from '@noble/secp256k1';
 
 import * as words from '../internal/words.json';
-import { Result, toHex, isValidPrivateKey } from '../utils';
+import { Result, toHex, isValidHexPrivateKey } from '../utils';
 
 export interface Account {
   /**
@@ -122,7 +122,7 @@ export function getAccountFromPrivateKey(privateKey: string) : Result<Account, A
     privateKey = privateKey.slice(2);
   }
 
-  if (!isValidPrivateKey(privateKey)) {
+  if (!isValidHexPrivateKey(privateKey)) {
     return { ok: false, error: AccountError.InvalidPrivateKey };
   }
 
@@ -150,7 +150,7 @@ export function sign(data: string, privateKey: string) : Result<string, AccountE
     privateKey = privateKey.slice(2);
   }
 
-  if (!isValidPrivateKey(privateKey)) {
+  if (!isValidHexPrivateKey(privateKey)) {
     return { ok: false, error: AccountError.InvalidPrivateKey };
   }
 

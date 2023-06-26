@@ -35,7 +35,7 @@ export class MockProvider implements Provider {
       return true as T;
     } else if (method === 'BouncerServer.SendTransaction') {
       return true as T;
-    } else if (method === 'BouncerServer.NewCaesarMessage') {
+    } else if (method === 'BouncerServer.NewMessage') {
       return true as T;
     }
     return {} as T;
@@ -242,7 +242,55 @@ test('sendTransaction', async () => {
 });
 
 test('sendMessage', async () => {
-  await nite.sendMessage('', '', '')
+  await nite.sendMessage('', '', '', '')
+    .then(result => {
+      match(
+        result, {
+          ok: _ => {
+            expect(false).toBeTruthy();
+          },
+          err: e => {
+            expect(e).toBe(NiteError.InvalidSenderPrivateKey);
+          }
+        }
+      )
+    }, _ => {
+      expect(false).toBeTruthy();
+    })
+    .catch(_ => {
+      expect(false).toBeTruthy();
+    });
+
+    await nite.sendMessage(
+      '0xd6c0c61f6db291d5638340cb09a4431e4a600dcb8f21e3edba103c73de9d279f',
+      '',
+      '',
+      ''
+    )
+      .then(result => {
+        match(
+          result, {
+            ok: _ => {
+              expect(false).toBeTruthy();
+            },
+            err: e => {
+              expect(e).toBe(NiteError.InvalidSenderPublicKey);
+            }
+          }
+        )
+      }, _ => {
+        expect(false).toBeTruthy();
+      })
+      .catch(_ => {
+        expect(false).toBeTruthy();
+      });
+
+  await nite.sendMessage(
+    '0xd6c0c61f6db291d5638340cb09a4431e4a600dcb8f21e3edba103c73de9d279f',
+    '0x04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
+    '',
+    ''
+  )
     .then(result => {
       match(
         result, {
@@ -262,30 +310,7 @@ test('sendMessage', async () => {
     });
 
   await nite.sendMessage(
-    '0x04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
-    '',
-    ''
-  )
-    .then(result => {
-      match(
-        result, {
-          ok: _ => {
-            expect(false).toBeTruthy();
-          },
-          err: e => {
-            expect(e).toBe(NiteError.InvalidSenderPublicKey);
-          }
-        }
-      )
-    }, _ => {
-      expect(false).toBeTruthy();
-    })
-    .catch(_ => {
-      expect(false).toBeTruthy();
-    });
-
-
-  await nite.sendMessage(
+    '0xd6c0c61f6db291d5638340cb09a4431e4a600dcb8f21e3edba103c73de9d279f',
     '0x04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
     '0x55c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
     ''
@@ -309,6 +334,7 @@ test('sendMessage', async () => {
     });
 
   await nite.sendMessage(
+    '0xd6c0c61f6db291d5638340cb09a4431e4a600dcb8f21e3edba103c73de9d279f',
     '0x04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
     '0x55c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
     'Hello, world!'

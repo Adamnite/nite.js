@@ -5,9 +5,13 @@
  * This code is open-sourced under the MIT license.
  */
 
+import { sha256 } from '@noble/hashes/sha256';
+import { hmac } from '@noble/hashes/hmac';
+import * as secp256k1 from '@noble/secp256k1';
+
 import { SignedTranscation } from './accounts';
 import { Provider } from './providers';
-import { isHex, Result } from './utils';
+import { isHex, isValidHexPrivateKey, Result } from './utils';
 
 import * as packageInfo from '../package.json';
 
@@ -16,6 +20,7 @@ export enum NiteError {
   InvalidMessage,
   InvalidProvider,
   InvalidReceiverPublicKey,
+  InvalidSenderPrivateKey,
   InvalidSenderPublicKey,
   RpcCommunicationError
 };
@@ -254,12 +259,18 @@ export class Nite {
   /**
    * Sends Caesar message.
    *
-   * @param toPublicKey Public key of receiver
-   * @param fromPublicKey Public key of sender
+   * @param fromPrivateKey Sender's private key in hexadecimal format
+   * @param fromPublicKey Sender's public key in hexadecimal format
+   * @param toPublicKey Receiver's public key in hexadecimal format
    * @param message Caesar message
    * @returns True if operation was successful, false otherwise
    */
-  async sendMessage(toPublicKey: string, fromPublicKey: string, message: string) : Promise<Result<boolean, NiteError>> {
+  async sendMessage(
+    fromPrivateKey: string,
+    fromPublicKey: string,
+    toPublicKey: string,
+    message: string
+  ) : Promise<Result<boolean, NiteError>> {
     if (!this.provider) {
       return {
         ok: false,
@@ -267,23 +278,32 @@ export class Nite {
       };
     }
 
-    if (toPublicKey.startsWith('0x') || toPublicKey.startsWith('0X')) {
-      toPublicKey = toPublicKey.slice(2);
+    if (fromPrivateKey.startsWith('0x') || fromPrivateKey.startsWith('0X')) {
+      fromPrivateKey = fromPrivateKey.slice(2);
     }
     if (fromPublicKey.startsWith('0x') || fromPublicKey.startsWith('0X')) {
       fromPublicKey = fromPublicKey.slice(2);
     }
+    if (toPublicKey.startsWith('0x') || toPublicKey.startsWith('0X')) {
+      toPublicKey = toPublicKey.slice(2);
+    }
 
-    if (!isValidHexPublicKey(toPublicKey)) {
+    if (!isValidHexPrivateKey(fromPrivateKey)) {
       return {
         ok: false,
-        error: NiteError.InvalidReceiverPublicKey
+        error: NiteError.InvalidSenderPrivateKey
       };
     }
     if (!isValidHexPublicKey(fromPublicKey)) {
       return {
         ok: false,
         error: NiteError.InvalidSenderPublicKey
+      };
+    }
+    if (!isValidHexPublicKey(toPublicKey)) {
+      return {
+        ok: false,
+        error: NiteError.InvalidReceiverPublicKey
       };
     }
 
@@ -294,7 +314,21 @@ export class Nite {
       };
     }
 
-    return await this.provider.send<boolean>('BouncerServer.NewMessage', [toPublicKey, fromPublicKey, message])
+    const AES = require('crypto-js/aes');
+    const encryptedMessage = AES.encrypt(message, toPublicKey).ciphertext.toString();
+
+    secp256k1.utils.hmacSha256Sync = (k, ...m) => hmac(sha256, k, secp256k1.utils.concatBytes(...m));
+    const signedMessage = secp256k1.signSync(encryptedMessage, fromPrivateKey);
+
+    return await this.provider.send<boolean>(
+      'BouncerServer.NewMessage',
+      [
+        fromPublicKey,
+        toPublicKey,
+        encryptedMessage,
+        Buffer.from(signedMessage).toString('hex'),
+      ]
+    )
       .then((result): Result<boolean, NiteError> => {
         return {
           ok: true,
