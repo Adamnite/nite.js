@@ -9,8 +9,7 @@ on:
       - main
 
 jobs:
-  run-action:
-    name: Run action
+  build:
     runs-on: ubuntu-latest
 
     steps:
