@@ -6,7 +6,7 @@
  */
 
 import { Nite, NiteError } from '../index';
-import { HttpProvider, Provider } from '../providers';
+import { Provider } from '../providers';
 import { match } from '../utils';
 
 const CHAIN_ID: string = '123';
@@ -15,6 +15,10 @@ const ACCOUNTS: string[] = [
   '23m3Ho7PwouaFzU8iXMLo7Pwoadf',
   '8iXMLygwuXNW7zU8iXMLygwuXNW7',
   '69m3Ho7PwouaFzU69m3Ho7PwouaF',
+];
+const MESSAGES: string[] = [
+  'Hello, world!',
+  'Hello, world, again!'
 ];
 
 export class MockProvider implements Provider {
@@ -37,6 +41,8 @@ export class MockProvider implements Provider {
       return true as T;
     } else if (method === 'BouncerServer.NewMessage') {
       return true as T;
+    } else if (method === 'BouncerServer.GetMessages') {
+      return MESSAGES as T;
     }
     return {} as T;
   }
@@ -344,6 +350,96 @@ test('sendMessage', async () => {
         result, {
           ok: v => {
             expect(v).toBeTruthy();
+          },
+          err: _ => {
+            expect(false).toBeTruthy();
+          }
+        }
+      )
+    }, _ => {
+      expect(false).toBeTruthy();
+    })
+    .catch(_ => {
+      expect(false).toBeTruthy();
+    });
+});
+
+test('getMessages', async () => {
+  await nite.getMessages('', '', '')
+    .then(result => {
+      match(
+        result, {
+          ok: _ => {
+            expect(false).toBeTruthy();
+          },
+          err: e => {
+            expect(e).toBe(NiteError.InvalidSenderAddress);
+          }
+        }
+      )
+    }, _ => {
+      expect(false).toBeTruthy();
+    })
+    .catch(_ => {
+      expect(false).toBeTruthy();
+    });
+
+    await nite.getMessages(
+      '23m3Ho7PwouaFzU8iXMLygwuXNW7',
+      '',
+      ''
+    )
+      .then(result => {
+        match(
+          result, {
+            ok: _ => {
+              expect(false).toBeTruthy();
+            },
+            err: e => {
+              expect(e).toBe(NiteError.InvalidReceiverAddress);
+            }
+          }
+        )
+      }, _ => {
+        expect(false).toBeTruthy();
+      })
+      .catch(_ => {
+        expect(false).toBeTruthy();
+      });
+
+  await nite.getMessages(
+    '23m3Ho7PwouaFzU8iXMLygwuXNW7',
+    '44m3Ho7PwouaFzU8iXMLygwuXNW7',
+    ''
+  )
+    .then(result => {
+      match(
+        result, {
+          ok: _ => {
+            expect(false).toBeTruthy();
+          },
+          err: e => {
+            expect(e).toBe(NiteError.InvalidReceiverPublicKey);
+          }
+        }
+      )
+    }, _ => {
+      expect(false).toBeTruthy();
+    })
+    .catch(_ => {
+      expect(false).toBeTruthy();
+    });
+
+  await nite.getMessages(
+    '23m3Ho7PwouaFzU8iXMLygwuXNW7',
+    '44m3Ho7PwouaFzU8iXMLygwuXNW7',
+    '0x55c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f'
+  )
+    .then(result => {
+      match(
+        result, {
+          ok: v => {
+            expect(v.length).toBeGreaterThan(0);
           },
           err: _ => {
             expect(false).toBeTruthy();

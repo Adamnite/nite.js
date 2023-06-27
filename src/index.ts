@@ -19,7 +19,9 @@ export enum NiteError {
   InvalidInput,
   InvalidMessage,
   InvalidProvider,
+  InvalidReceiverAddress,
   InvalidReceiverPublicKey,
+  InvalidSenderAddress,
   InvalidSenderPrivateKey,
   InvalidSenderPublicKey,
   RpcCommunicationError
@@ -189,17 +191,17 @@ export class Nite {
    * @returns True if operation was successful, false otherwise
    */
   async addAccount(address: string) : Promise<Result<boolean, NiteError>> {
-    if (!isValidAddress(address)) {
-      return {
-        ok: false,
-        error: NiteError.InvalidInput
-      };
-    }
-
     if (!this.provider) {
       return {
         ok: false,
         error: NiteError.InvalidProvider
+      };
+    }
+
+    if (!isValidAddress(address)) {
+      return {
+        ok: false,
+        error: NiteError.InvalidInput
       };
     }
 
@@ -226,17 +228,17 @@ export class Nite {
    * @returns True if operation was successful, false otherwise
    */
   async sendTransaction(transaction: SignedTranscation) : Promise<Result<boolean, NiteError>> {
-    if (!transaction.hash || !transaction.raw) {
-      return {
-        ok: false,
-        error: NiteError.InvalidInput
-      };
-    }
-
     if (!this.provider) {
       return {
         ok: false,
         error: NiteError.InvalidProvider
+      };
+    }
+
+    if (!transaction.hash || !transaction.raw) {
+      return {
+        ok: false,
+        error: NiteError.InvalidInput
       };
     }
 
@@ -336,6 +338,63 @@ export class Nite {
         };
       })
       .catch((error): Result<boolean, NiteError> => {
+        console.log(`RPC communication error: ${error}`);
+        return {
+          ok: false,
+          error: NiteError.RpcCommunicationError
+        };
+      });
+  }
+
+  /**
+   * Gets Caesar messages sent between two accounts.
+   *
+   * @param fromAddress Sender's address in hexadecimal format
+   * @param toAddress Receiver's address in hexadecimal format
+   * @param toPublicKey Receiver's public key in hexadecimal format
+   * @returns Caesar messages
+   */
+  async getMessages(fromAddress: string, toAddress: string, toPublicKey: string) : Promise<Result<string[], NiteError>> {
+    if (!this.provider) {
+      return {
+        ok: false,
+        error: NiteError.InvalidProvider
+      };
+    }
+
+    if (toPublicKey.startsWith('0x') || toPublicKey.startsWith('0X')) {
+      toPublicKey = toPublicKey.slice(2);
+    }
+
+    if (!isValidAddress(fromAddress)) {
+      return {
+        ok: false,
+        error: NiteError.InvalidSenderAddress
+      };
+    }
+    if (!isValidAddress(toAddress)) {
+      return {
+        ok: false,
+        error: NiteError.InvalidReceiverAddress
+      };
+    }
+    if (!isValidHexPublicKey(toPublicKey)) {
+      return {
+        ok: false,
+        error: NiteError.InvalidReceiverPublicKey
+      };
+    }
+
+    const AES = require('crypto-js/aes');
+
+    return await this.provider.send<string[]>('BouncerServer.GetMessages', [fromAddress, toAddress,])
+      .then((result): Result<string[], NiteError> => {
+        return {
+          ok: true,
+          value: result.map(m => AES.decrypt(Buffer.from(m, 'hex'), toPublicKey))
+        };
+      })
+      .catch((error): Result<string[], NiteError> => {
         console.log(`RPC communication error: ${error}`);
         return {
           ok: false,
