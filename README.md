@@ -1,7 +1,5 @@
 # nite.js
 
-![Test](https://github.com/Adamnite/nite.js/actions/workflows/test.yml/badge.svg)
-
 Adamnite Javascript API
 
 ## Getting started
