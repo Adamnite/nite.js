@@ -6,7 +6,7 @@
  */
 
 import { Nite, NiteError } from '../index';
-import { Provider } from '../providers';
+import { HttpProvider, Provider } from '../providers';
 import { match } from '../utils';
 
 const CHAIN_ID: string = '123';
@@ -365,7 +365,7 @@ test('sendMessage', async () => {
 });
 
 test('getMessages', async () => {
-  await nite.getMessages('', '', '')
+  await nite.getMessages('', '')
     .then(result => {
       match(
         result, {
@@ -373,7 +373,7 @@ test('getMessages', async () => {
             expect(false).toBeTruthy();
           },
           err: e => {
-            expect(e).toBe(NiteError.InvalidSenderAddress);
+            expect(e).toBe(NiteError.InvalidSenderPublicKey);
           }
         }
       )
@@ -385,9 +385,8 @@ test('getMessages', async () => {
     });
 
     await nite.getMessages(
-      '23m3Ho7PwouaFzU8iXMLygwuXNW7',
+      '0x04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
       '',
-      ''
     )
       .then(result => {
         match(
@@ -396,7 +395,7 @@ test('getMessages', async () => {
               expect(false).toBeTruthy();
             },
             err: e => {
-              expect(e).toBe(NiteError.InvalidReceiverAddress);
+              expect(e).toBe(NiteError.InvalidReceiverPublicKey);
             }
           }
         )
@@ -408,32 +407,8 @@ test('getMessages', async () => {
       });
 
   await nite.getMessages(
-    '23m3Ho7PwouaFzU8iXMLygwuXNW7',
-    '44m3Ho7PwouaFzU8iXMLygwuXNW7',
-    ''
-  )
-    .then(result => {
-      match(
-        result, {
-          ok: _ => {
-            expect(false).toBeTruthy();
-          },
-          err: e => {
-            expect(e).toBe(NiteError.InvalidReceiverPublicKey);
-          }
-        }
-      )
-    }, _ => {
-      expect(false).toBeTruthy();
-    })
-    .catch(_ => {
-      expect(false).toBeTruthy();
-    });
-
-  await nite.getMessages(
-    '23m3Ho7PwouaFzU8iXMLygwuXNW7',
-    '44m3Ho7PwouaFzU8iXMLygwuXNW7',
-    '0x55c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f'
+    '0x04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
+    '0x55c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f',
   )
     .then(result => {
       match(

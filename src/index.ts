@@ -11,7 +11,7 @@ import * as secp256k1 from '@noble/secp256k1';
 
 import { SignedTranscation } from './accounts';
 import { Provider } from './providers';
-import { isHex, isValidHexPrivateKey, Result } from './utils';
+import { isHex, toHex, isValidHexPrivateKey, Result } from './utils';
 
 import * as packageInfo from '../package.json';
 
@@ -19,9 +19,7 @@ export enum NiteError {
   InvalidInput,
   InvalidMessage,
   InvalidProvider,
-  InvalidReceiverAddress,
   InvalidReceiverPublicKey,
-  InvalidSenderAddress,
   InvalidSenderPrivateKey,
   InvalidSenderPublicKey,
   RpcCommunicationError
@@ -327,7 +325,7 @@ export class Nite {
       [
         fromPublicKey,
         toPublicKey,
-        encryptedMessage,
+        toHex(message),
         Buffer.from(signedMessage).toString('hex'),
       ]
     )
@@ -349,12 +347,11 @@ export class Nite {
   /**
    * Gets Caesar messages sent between two accounts.
    *
-   * @param fromAddress Sender's address in hexadecimal format
-   * @param toAddress Receiver's address in hexadecimal format
+   * @param fromPublicKey Sender's public key in hexadecimal format
    * @param toPublicKey Receiver's public key in hexadecimal format
    * @returns Caesar messages
    */
-  async getMessages(fromAddress: string, toAddress: string, toPublicKey: string) : Promise<Result<string[], NiteError>> {
+  async getMessages(fromPublicKey: string, toPublicKey: string) : Promise<Result<string[], NiteError>> {
     if (!this.provider) {
       return {
         ok: false,
@@ -362,20 +359,17 @@ export class Nite {
       };
     }
 
+    if (fromPublicKey.startsWith('0x') || fromPublicKey.startsWith('0X')) {
+      fromPublicKey = fromPublicKey.slice(2);
+    }
     if (toPublicKey.startsWith('0x') || toPublicKey.startsWith('0X')) {
       toPublicKey = toPublicKey.slice(2);
     }
 
-    if (!isValidAddress(fromAddress)) {
+    if (!isValidHexPublicKey(fromPublicKey)) {
       return {
         ok: false,
-        error: NiteError.InvalidSenderAddress
-      };
-    }
-    if (!isValidAddress(toAddress)) {
-      return {
-        ok: false,
-        error: NiteError.InvalidReceiverAddress
+        error: NiteError.InvalidSenderPublicKey
       };
     }
     if (!isValidHexPublicKey(toPublicKey)) {
@@ -387,11 +381,11 @@ export class Nite {
 
     const AES = require('crypto-js/aes');
 
-    return await this.provider.send<string[]>('BouncerServer.GetMessages', [fromAddress, toAddress,])
+    return await this.provider.send<string[]>('BouncerServer.GetMessages', [fromPublicKey, toPublicKey,])
       .then((result): Result<string[], NiteError> => {
         return {
           ok: true,
-          value: result && result.map(m => AES.decrypt(Buffer.from(m, 'hex'), toPublicKey).toString())
+          value: result && result.map(m => Buffer.from(m, 'hex').toString())
         };
       })
       .catch((error): Result<string[], NiteError> => {
