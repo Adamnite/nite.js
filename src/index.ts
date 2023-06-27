@@ -391,7 +391,7 @@ export class Nite {
       .then((result): Result<string[], NiteError> => {
         return {
           ok: true,
-          value: result.map(m => AES.decrypt(Buffer.from(m, 'hex'), toPublicKey))
+          value: result.map(m => AES.decrypt(Buffer.from(m, 'hex'), toPublicKey).toString())
         };
       })
       .catch((error): Result<string[], NiteError> => {
