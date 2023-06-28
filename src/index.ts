@@ -35,6 +35,10 @@ const isValidHexPublicKey = (key: string) => {
   return key && key.length === HEX_PUBLIC_KEY_LENGTH && isHex(key);
 };
 
+interface Messages {
+  [Key: number]: string;
+}
+
 export class Nite {
   /**
    * Version of the Adamnite JavaScript API.
@@ -351,7 +355,7 @@ export class Nite {
    * @param toPublicKey Receiver's public key in hexadecimal format
    * @returns Caesar messages
    */
-  async getMessages(fromPublicKey: string, toPublicKey: string) : Promise<Result<string[], NiteError>> {
+  async getMessages(fromPublicKey: string, toPublicKey: string) : Promise<Result<Messages, NiteError>> {
     if (!this.provider) {
       return {
         ok: false,
@@ -381,14 +385,18 @@ export class Nite {
 
     const AES = require('crypto-js/aes');
 
-    return await this.provider.send<string[]>('BouncerServer.GetMessages', [fromPublicKey, toPublicKey,])
-      .then((result): Result<string[], NiteError> => {
+    return await this.provider.send<Messages>('BouncerServer.GetMessages', [fromPublicKey, toPublicKey,])
+      .then((result): Result<Messages, NiteError> => {
+        let messages: Messages = {};
+        for (let timestamp in result) {
+          messages[timestamp] = Buffer.from(result[timestamp], 'hex').toString();
+        }
         return {
           ok: true,
-          value: result && result.map(m => Buffer.from(m, 'hex').toString())
+          value: messages
         };
       })
-      .catch((error): Result<string[], NiteError> => {
+      .catch((error): Result<Messages, NiteError> => {
         console.log(`RPC communication error: ${error}`);
         return {
           ok: false,
