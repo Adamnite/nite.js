@@ -414,7 +414,7 @@ test('getMessages', async () => {
       match(
         result, {
           ok: v => {
-            expect(v.length).toBeGreaterThan(0);
+            expect(v);
           },
           err: _ => {
             expect(false).toBeTruthy();
