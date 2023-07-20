@@ -16,10 +16,20 @@ const ACCOUNTS: string[] = [
   '8iXMLygwuXNW7zU8iXMLygwuXNW7',
   '69m3Ho7PwouaFzU69m3Ho7PwouaF',
 ];
-const MESSAGES: string[] = [
-  'Hello, world!',
-  'Hello, world, again!'
-];
+const MESSAGES: any = {
+  '0x04c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f': [
+    {
+      timestamp: 12345678,
+      content: 'Hello, world!'
+    }
+  ],
+  '0x55c205aa76174a126606bc6f411a1ee421e6c2219d4af8353f1a8b6ca359d796b7de2e5fb84c87a806dc40bcd30cda66712548c69b9779b58da9020a7342128a5f': [
+    {
+      timestamp: 12345679,
+      content: 'Hello to you too!'
+    }
+  ]
+};
 
 export class MockProvider implements Provider {
   url: string;

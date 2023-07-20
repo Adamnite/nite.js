@@ -35,8 +35,13 @@ const isValidHexPublicKey = (key: string) => {
   return key && key.length === HEX_PUBLIC_KEY_LENGTH && isHex(key);
 };
 
+interface MessageContent {
+  timestamp: number;
+  content: string;
+}
+
 interface Messages {
-  [Key: number]: string;
+  [Key: string]: MessageContent[];
 }
 
 export class Nite {
@@ -387,13 +392,16 @@ export class Nite {
 
     return await this.provider.send<Messages>('BouncerServer.GetMessages', [fromPublicKey, toPublicKey,])
       .then((result): Result<Messages, NiteError> => {
-        let messages: Messages = {};
-        for (let timestamp in result) {
-          messages[timestamp] = Buffer.from(result[timestamp], 'hex').toString();
+        let decodedMessages: Messages = {};
+        for (const publicKey in result) {
+          decodedMessages[publicKey] = result[publicKey].map(message => ({
+            timestamp: message.timestamp,
+            content: Buffer.from(message.content, 'hex').toString()
+          }));
         }
         return {
           ok: true,
-          value: messages
+          value: decodedMessages
         };
       })
       .catch((error): Result<Messages, NiteError> => {
