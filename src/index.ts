@@ -35,13 +35,10 @@ const isValidHexPublicKey = (key: string) => {
   return key && key.length === HEX_PUBLIC_KEY_LENGTH && isHex(key);
 };
 
-interface MessageContent {
+interface Message {
+  fromPublicKey: string;
   timestamp: number;
   content: string;
-}
-
-interface Messages {
-  [Key: string]: MessageContent[];
 }
 
 export class Nite {
@@ -360,7 +357,7 @@ export class Nite {
    * @param toPublicKey Receiver's public key in hexadecimal format
    * @returns Caesar messages
    */
-  async getMessages(fromPublicKey: string, toPublicKey: string) : Promise<Result<Messages, NiteError>> {
+  async getMessages(fromPublicKey: string, toPublicKey: string) : Promise<Result<Message[], NiteError>> {
     if (!this.provider) {
       return {
         ok: false,
@@ -390,21 +387,18 @@ export class Nite {
 
     const AES = require('crypto-js/aes');
 
-    return await this.provider.send<Messages>('BouncerServer.GetMessages', [fromPublicKey, toPublicKey,])
-      .then((result): Result<Messages, NiteError> => {
-        let decodedMessages: Messages = {};
-        for (const publicKey in result) {
-          decodedMessages[publicKey] = result[publicKey].map(message => ({
-            timestamp: message.timestamp,
-            content: Buffer.from(message.content, 'hex').toString()
-          }));
-        }
+    return await this.provider.send<Message[]>('BouncerServer.GetMessages', [fromPublicKey, toPublicKey,])
+      .then((result): Result<Message[], NiteError> => {
         return {
           ok: true,
-          value: decodedMessages
+          value: result.map(message => ({
+            fromPublicKey: message.fromPublicKey,
+            timestamp: message.timestamp,
+            content: Buffer.from(message.content, 'hex').toString()
+          }))
         };
       })
-      .catch((error): Result<Messages, NiteError> => {
+      .catch((error): Result<Message[], NiteError> => {
         console.log(`RPC communication error: ${error}`);
         return {
           ok: false,
